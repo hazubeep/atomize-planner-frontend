@@ -14,7 +14,7 @@ export const mockRegister = async () => {
 
 export const mockLogin = async ({ email, password }) => {
   await delay();
-  if (email !== mockUser.email || password !== "password123")
+  if (email !== mockUser.email || password !== "securepassword123")
     throw { response: { data: { message: "Invalid credentials" } } };
   return { user: mockUser, token: mockToken };
 };

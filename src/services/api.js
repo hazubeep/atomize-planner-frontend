@@ -11,4 +11,13 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (res) => res,
+  (error) => {
+    const message = error.response?.data?.message || "Something went wrong";
+    const errors = error.response?.data?.errors || null;
+    return Promise.reject({ message, errors, status: error.response?.status });
+  }
+);
+
 export default api;
