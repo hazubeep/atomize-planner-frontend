@@ -1,1 +1,115 @@
 @import "tailwindcss";
+
+:root {
+  /* ── Backgrounds ── */
+  --color-bg:          #FAF9F6;
+  --color-bg-outer:    #FAF9F6;
+  --color-surface:     #ffffff;
+  --color-surface-2:   #F0F0EC;
+
+  /* ── Cyan gradient overlay (pojok kanan atas) ── */
+  --color-bg-gradient: radial-gradient(ellipse at top right, rgba(0,210,190,0.12) 0%, transparent 60%);
+
+  /* ── Borders ── */
+  --color-border:      #e8efef;
+
+  /* ── Text ── */
+  --color-text-primary:   #111827;
+  --color-text-secondary: #4b5563;
+  --color-text-muted:     #9ca3af;
+
+  /* ── Accent: hijau gelap ── */
+  --color-accent:       #1a6b5a;
+  --color-accent-light: #e0f5f2;
+  --color-accent-hover: #155a4a;
+  --color-accent-dark:  #0f4a3c;
+
+  /* ── Cyan cerah ── */
+  --color-teal:         #00c4a7;
+  --color-teal-light:   #d0f5f0;
+  --color-teal-border:  #a0e8df;
+
+  /* ── Progress gradient ── */
+  --gradient-progress: linear-gradient(90deg, #1a6b5a 0%, #00c4a7 100%);
+
+  /* ── Warning / badge (amber) ── */
+  --color-warning:       #d97706;
+  --color-warning-light: #fef3c7;
+  --color-warning-border:#fde68a;
+
+  /* ── Typography ── */
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+
+  /* ── Radii ── */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: #FAF9F6;
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+}
+
+#root {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar       { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 2px; }
+
+/* ── Animations ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.animate-fade-in  { animation: fadeIn  0.25s ease forwards; }
+.animate-slide-up { animation: slideUp 0.35s ease forwards; }
+
+.skeleton {
+  background: linear-gradient(90deg, var(--color-surface-2) 25%, var(--color-border) 50%, var(--color-surface-2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}

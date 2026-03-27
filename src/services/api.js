@@ -1,33 +1,43 @@
-import axios from "axios";
+import axios from 'axios'
 
 const api = axios.create({
-  baseURL: "https://api.atomizeplanner.test/v1",
-  headers: { "Content-Type": "application/json" },
-});
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+// ── Request interceptor: attach auth token ──────────────────────────────────
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => Promise.reject(error)
+)
 
+// ── Response interceptor: normalise errors ───────────────────────────────────
 api.interceptors.response.use(
-  (res) => res,
+  (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-      window.location.href = "/login";
+    const status = error.response?.status
+
+    if (status === 401) {
+      localStorage.removeItem('token')
+      window.location.href = '/login'
     }
 
-    const customError = {
-      message: error.response?.data?.message || "Something went wrong",
-      errors: error.response?.data?.errors || null,
-      status: error.response?.status,
-      original: error,
-    };
+    const message =
+      error.response?.data?.message ||
+      error.message ||
+      'Terjadi kesalahan. Silakan coba lagi.'
 
-    return Promise.reject(customError);
+    return Promise.reject(new Error(message))
   }
-);
+)
 
-export default api;
+export default api

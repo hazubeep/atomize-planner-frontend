@@ -56,7 +56,7 @@ export const mockToggleMicroStep = async (id, is_completed) => {
   tasks = tasks.map((task) => ({
     ...task,
     micro_steps: task.micro_steps.map((step) => {
-      if (step.id !== id) return step;
+      if (String(step.id) !== String(id)) return step;
       updatedStep = { ...step, is_completed: is_completed !== undefined ? is_completed : !step.is_completed, updated_at: new Date().toISOString() };
       return updatedStep;
     }),
