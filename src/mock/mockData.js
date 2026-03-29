@@ -19,7 +19,7 @@ export const mockTasks = [
     micro_steps: [
       { id: 1, task_id: 1, title: "Empty the dishwasher", is_completed: true, estimated_duration: 10, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
       { id: 2, task_id: 1, title: "Wipe down the countertops", is_completed: false, estimated_duration: 15, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
-      { id: 3, task_id: 1, title: "Clean the stovetop", is_completed: false, estimated_duration: 20, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
+      { id: 3, task_id: 1, title: "Clean the stovetop", is_completed: false, estimated_duration: 30, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
       { id: 4, task_id: 1, title: "Mop the floor", is_completed: false, estimated_duration: 15, created_at: "2024-01-01T00:00:00Z", updated_at: "2024-01-01T00:00:00Z" },
     ],
   },

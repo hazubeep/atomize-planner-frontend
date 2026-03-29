@@ -1,1 +1,119 @@
 @import "tailwindcss";
+
+@theme {
+  --color-bg: #faf9f6;
+  --color-bg-outer: #faf9f6;
+  --color-surface: #ffffff;
+  --color-surface-2: #f0f0ec;
+  --color-border: #e8efef;
+  --color-text-primary: #111827;
+  --color-text-secondary: #4b5563;
+  --color-text-muted: #9ca3af;
+  --color-accent: #1a6b5a;
+  --color-accent-light: #e0f5f2;
+  --color-accent-hover: #155a4a;
+  --color-accent-dark: #0f4a3c;
+  --color-teal: #00c4a7;
+  --color-teal-light: #d0f5f0;
+  --color-teal-border: #a0e8df;
+  --color-warning: #d97706;
+  --color-warning-light: #fef3c7;
+  --color-warning-border: #fde68a;
+  --font-display: "DM Serif Display", Georgia, serif;
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.06);
+  --shadow-md: 0 4px 16px rgb(0 0 0 / 0.08);
+  --shadow-lg: 0 8px 32px rgb(0 0 0 / 0.12);
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html,
+  body,
+  #root {
+    @apply h-full w-full;
+  }
+
+  body {
+    @apply min-h-screen w-full flex justify-center items-start font-sans antialiased;
+    background-color: var(--color-bg);
+    color: var(--color-text-primary);
+  }
+
+  #root {
+    @apply flex w-full justify-center;
+  }
+
+  html::-webkit-scrollbar {
+    width: 4px;
+  }
+  html::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  html::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 2px;
+  }
+}
+
+@utility animate-fade-in {
+  animation: fade-in 0.25s ease forwards;
+}
+
+@utility animate-slide-up {
+  animation: slide-up 0.35s ease forwards;
+}
+
+@utility skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-2) 25%,
+    var(--color-border) 50%,
+    var(--color-surface-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
