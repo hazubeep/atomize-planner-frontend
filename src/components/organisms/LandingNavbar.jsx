@@ -36,10 +36,19 @@ const LandingNavbar = () => {
     scrollToId('top')
   }
 
+  const goToMethodology = () => {
+    if (location.pathname !== '/') {
+      navigate('/')
+      setTimeout(() => scrollToId('methodology'), 0)
+      return
+    }
+    scrollToId('methodology')
+  }
+
   return (
     <header className="fixed left-0 right-0 top-0 z-[1000] border-b border-border bg-[rgba(250,249,246,0.9)] backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-[1120px] items-center px-16">
-        <div className="flex min-w-[180px] items-center">
+      <div className="flex h-14 w-full items-center px-6 lg:px-16">
+        <div className="flex flex-1 items-center">
           <button
             type="button"
             onClick={goToTop}
@@ -53,15 +62,12 @@ const LandingNavbar = () => {
           <button type="button" onClick={goToFeatures} className={navBtn(location.pathname === '/')}>
             Features
           </button>
-          <button type="button" onClick={() => navigate('/methodology')} className={navBtn(location.pathname === '/methodology')}>
+          <button type="button" onClick={goToMethodology} className={navBtn(location.pathname === '/')}>
             Methodology
-          </button>
-          <button type="button" onClick={() => navigate('/pricing')} className={navBtn(location.pathname === '/pricing')}>
-            Pricing
           </button>
         </nav>
 
-        <div className="flex min-w-[180px] items-center justify-end">
+        <div className="flex flex-1 items-center justify-end">
           <button
             type="button"
             onClick={() => navigate('/home')}

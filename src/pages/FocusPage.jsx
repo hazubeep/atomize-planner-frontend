@@ -154,10 +154,16 @@ const FocusPage = () => {
         <Spinner size="lg" />
       </div>
     )
-  if (error) return <ErrorMessage message={error} onRetry={fetchTasks} />
+  if (error)
+    return (
+      <div className="pt-[22px]">
+        <ErrorMessage message={error} onRetry={fetchTasks} />
+      </div>
+    )
 
   return (
-    <div className="animate-fade-in px-5 pb-[100px] pt-[22px]">
+    <>
+    <div className="animate-fade-in flex flex-col pb-8 pt-[22px]">
       {tasks.length > 1 && (
         <div className="-mx-1 mb-5 flex gap-2 overflow-x-auto pb-1">
           {tasks.map((t) => (
@@ -194,7 +200,9 @@ const FocusPage = () => {
                 isCurrent={i === currentIdx}
                 toggling={toggling === step.id}
                 onToggle={handleToggle}
-                onEnterDeepFocus={() => navigate('/DeepFocus')}
+                onEnterDeepFocus={() =>
+                  navigate('/DeepFocus', { state: { taskId: focusId, stepId: step.id } })
+                }
               />
             ))}
           </div>
@@ -229,7 +237,7 @@ const FocusPage = () => {
           </div>
         </>
       ) : (
-        <div className="px-5 py-[60px] text-center">
+        <div className="py-[60px] text-center">
           <div className="mb-3 text-[40px]">🎯</div>
           <p className="mb-1.5 text-sm font-semibold text-text-primary">No active task</p>
           <p className="mb-5 text-xs text-text-muted">Create a goal and AI will break it into steps.</p>
@@ -243,8 +251,9 @@ const FocusPage = () => {
         </div>
       )}
 
-      <AddGoalButton />
     </div>
+    <AddGoalButton />
+    </>
   )
 }
 

@@ -4,7 +4,7 @@ const linkClass =
 const LandingFooter = () => {
   return (
     <footer className="border-t border-border bg-bg">
-      <div className="mx-auto max-w-[1120px] px-[clamp(20px,4vw,64px)] py-7">
+      <div className="w-full px-6 py-7 lg:px-16">
         <div className="flex flex-wrap items-start justify-between gap-[18px]">
           <div className="flex flex-col gap-1.5">
             <span className="font-display text-base text-text-primary">AtomizePlanner</span>

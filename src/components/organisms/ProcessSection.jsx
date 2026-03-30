@@ -27,13 +27,13 @@ const steps = [
     desc: 'One task. One screen. No distractions. The UI adapts to eliminate everything but the current micro-step.',
     active: false,
     img: kotak3,
-    imgClassName: 'h-10 w-10 object-contain',
+    imgClassName: 'h-14 w-14 object-contain',
     imgAlign: 'flex-end',
   },
 ]
 
 const ProcessSection = () => (
-  <div className="bg-bg py-24">
+  <div id="methodology" className="bg-bg py-24">
     <Section>
       <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-text-muted">How it works</p>
       <h2 className="mb-2 font-display text-4xl font-normal text-text-primary">The Atomization Process</h2>
@@ -73,7 +73,7 @@ const ProcessSection = () => (
             </p>
             <div
               className={cn(
-                'mt-14 flex items-end',
+                'mt-auto flex items-end pt-8',
                 s.imgAlign === 'flex-end' ? 'justify-end' : s.active ? 'justify-center' : 'justify-start'
               )}
             >

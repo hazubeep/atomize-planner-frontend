@@ -1,7 +1,6 @@
-const PlaceholderPage = () => (
-  <div className="flex min-h-[60vh] items-center justify-center p-8 text-center text-xl font-semibold text-text-primary">
-    belum selesai
-  </div>
-)
+import { Navigate } from 'react-router-dom'
 
-export default PlaceholderPage
+// Temporary wiring: Goals page will use Focus UI for now.
+const GoalsPage = () => <Navigate to="/focus" replace />
+
+export default GoalsPage

@@ -41,7 +41,7 @@ const StepItem = ({ step, taskId, onMarkWorking, onReatomize, onDeconstruct, ind
     setLoadingWorking(true)
     try {
       await onMarkWorking?.(stepId)
-      navigate('/DeepFocus')
+      navigate('/DeepFocus', { state: { taskId, stepId } })
     } finally {
       setLoadingWorking(false)
     }
