@@ -2,6 +2,8 @@ import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useTasks from '../hooks/useTasks'
 import useTaskDetail from '../hooks/useTaskDetail'
+import { getActiveFocusSession, completeFocusSession } from '../services/focusService'
+import Spinner from '../components/atoms/Spinner'
 
 import tandaPanah from '../assets/tanda_panah.svg'
 import saveIcon from '../assets/save.svg'
@@ -119,6 +121,24 @@ const DeepFocusPage = () => {
   const safeTaskKey = taskId != null && String(taskId) !== '' ? String(taskId) : '__no_task__'
   const { toggleStep } = useTaskDetail(safeTaskKey, tasks, setTasks)
 
+  const [currentSession, setCurrentSession] = useState(null)
+  const [sessionLoading, setSessionLoading] = useState(true)
+
+  useEffect(() => {
+    const loadActive = async () => {
+      setSessionLoading(true)
+      try {
+        const res = await getActiveFocusSession()
+        setCurrentSession(res.data)
+      } catch {
+        setCurrentSession(null)
+      } finally {
+        setSessionLoading(false)
+      }
+    }
+    loadActive()
+  }, [])
+
   const initial = loadDurations()
   const [workTotal, setWorkTotal] = useState(initial.work)
   const [breakTotal, setBreakTotal] = useState(initial.brk)
@@ -197,21 +217,32 @@ const DeepFocusPage = () => {
   }
 
   const handleCompleteStep = async () => {
-    if (taskId != null && stepId != null) {
-      setCompleting(true)
-      try {
-        await toggleStep(stepId, false)
-      } catch {
-        /* still navigate */
-      } finally {
-        setCompleting(false)
+    setCompleting(true)
+    try {
+      if (currentSession?.session_id) {
+        await completeFocusSession(currentSession.session_id)
       }
+      if (taskId != null && stepId != null) {
+        await toggleStep(stepId, false)
+      }
+    } catch (err) {
+      console.error('Error completing session', err)
+    } finally {
+      setCompleting(false)
+      navigate('/focus')
     }
-    navigate('/focus')
+  }
+
+  if (sessionLoading) {
+    return (
+      <div className="flex justify-center py-20">
+        <Spinner size="lg" />
+      </div>
+    )
   }
 
   return (
-    <div className="flex h-dvh min-h-dvh w-full flex-col overflow-hidden bg-[#F8F9F8] font-sans text-[#333]">
+    <div className="flex min-h-screen w-full flex-col bg-[#F8F9F8] font-sans text-[#333]">
 
       <header className="sticky top-0 z-30 flex w-full shrink-0 items-center justify-between border-b border-black/5 bg-[#F8F9F8]/95 py-2.5 pl-3 pr-3 backdrop-blur-sm sm:pl-4 sm:pr-4">
         <button
@@ -236,7 +267,7 @@ const DeepFocusPage = () => {
         </div>
       </header>
 
-      <main className="flex min-h-0 w-full flex-1 flex-col items-center overflow-y-auto px-5 pb-44 pt-6 sm:px-8 md:pt-8">
+      <main className="flex w-full flex-1 flex-col items-center px-5 pt-6 sm:px-8 md:pt-8">
         <p
           className="mb-4 text-center text-[10px] font-medium uppercase tracking-[0.2em]"
           style={{ color: '#6b7280' }}
@@ -361,8 +392,8 @@ const DeepFocusPage = () => {
       </main>
 
       <footer
-        className="fixed bottom-0 left-0 right-0 z-20 border-t border-black/5 bg-[#F8F9F8] py-6 pl-5 pr-5 sm:py-8 sm:pl-10 sm:pr-8 md:pl-16"
-        style={{ color: '#5C605C' }}
+          className="mt-auto border-t border-black/5 bg-[#F8F9F8] py-6 pl-5 pr-5 sm:py-8 sm:pl-10 sm:pr-8 md:pl-16"
+          style={{ color: '#5C605C' }}
       >
         <h3 className="mb-3 text-left font-['Inter',sans-serif] text-xs font-bold uppercase tracking-wide sm:text-sm">
           SESSION NOTES
@@ -372,7 +403,6 @@ const DeepFocusPage = () => {
           <p>Keep the tone academic yet accessible.</p>
         </div>
       </footer>
-
       {settingsOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
@@ -427,8 +457,10 @@ const DeepFocusPage = () => {
             </div>
           </div>
         </div>
+
       )}
     </div>
+
   )
 }
 

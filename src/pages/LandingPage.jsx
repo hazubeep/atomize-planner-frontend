@@ -54,7 +54,7 @@ const LandingPage = () => {
               <div className="flex items-center gap-3">
                 <button
                   type="button"
-                  onClick={() => navigate('/home')}
+                  onClick={() => navigate('/register')}
                   className="cursor-pointer rounded-xl border-none bg-accent px-[clamp(22px,2.5vw,40px)] py-[clamp(12px,1.3vw,16px)] text-[clamp(14px,1.25vw,20px)] font-bold text-white"
                 >
                   Get Started Free

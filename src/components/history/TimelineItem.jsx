@@ -40,6 +40,5 @@ const TimelineItem = ({ date, title, description, category, microSteps, avatars 
     </div>
   );
 };
-/*******  210944f0-5735-4d8b-8c81-fd927706659d  *******/
 
 export default TimelineItem;

@@ -26,10 +26,9 @@ const StatusIcon = ({ status }) => {
   )
 }
 
-const StepItem = ({ step, taskId, onMarkWorking, onReatomize, onDeconstruct, index }) => {
+const StepItem = ({ step, taskId, onMarkWorking, onReatomize, index }) => {
   const [loadingWorking, setLoadingWorking] = useState(false)
   const [loadingReatomize, setLoadingReatomize] = useState(false)
-  const [loadingDeconstruct, setLoadingDeconstruct] = useState(false)
   const navigate = useNavigate();
 
   const stepId = step.id ?? step._id
@@ -50,11 +49,6 @@ const StepItem = ({ step, taskId, onMarkWorking, onReatomize, onDeconstruct, ind
   const handleReatomize = async () => {
     setLoadingReatomize(true)
     try { await onReatomize?.(taskId) } finally { setLoadingReatomize(false) }
-  }
-
-  const handleDeconstruct = async () => {
-    setLoadingDeconstruct(true)
-    try { await onDeconstruct?.(stepId) } finally { setLoadingDeconstruct(false) }
   }
 
   return (

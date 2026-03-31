@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { cn } from '../utils'
 import { logout } from '../services/authService'
 
@@ -18,7 +18,6 @@ const TOP_LINKS = [
 ]
 
 const MainLayout = ({ children }) => {
-  const location = useLocation()
   const navigate = useNavigate()
 
   const [profileOpen, setProfileOpen] = useState(false)

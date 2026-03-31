@@ -20,7 +20,7 @@ const useTaskDetail = (taskId, tasks, setTasks) => {
       return { ...t, micro_steps: updatedSteps, progress_percentage: progress }
     }))
     try {
-      return await toggleMicroStep(stepId, newCompleted)
+      return await toggleMicroStep(taskId, stepId, newCompleted)
     } catch (err) {
       // Revert on error
       setTasks(prev => prev.map(t => {

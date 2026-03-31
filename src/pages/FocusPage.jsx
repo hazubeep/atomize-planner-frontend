@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { cn } from '../utils'
 import useTasks from '../hooks/useTasks'
 import useTaskDetail from '../hooks/useTaskDetail'
+import { startFocusSession } from '../services/focusService'
 import Spinner from '../components/atoms/Spinner'
 import ErrorMessage from '../components/atoms/ErrorMessage'
 import AddGoalButton from '../components/molecules/AddGoalButton'
@@ -26,25 +27,19 @@ const CircleEmpty = ({ isCurrent }) => (
   />
 )
 
-const StepRow = ({ step, isCurrent, onToggle, toggling, onEnterDeepFocus }) => {
+const StepRow = ({ step, isCurrent, onToggle, toggling, onStartFocus }) => {
   const done = step.is_completed
   return (
     <div
       role={isCurrent ? 'button' : undefined}
       tabIndex={isCurrent ? 0 : undefined}
-      onClick={
-        isCurrent
-          ? () => {
-              onEnterDeepFocus?.()
-            }
-          : undefined
-      }
+      onClick={isCurrent ? onStartFocus : undefined}
       onKeyDown={
         isCurrent
           ? (e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault()
-                onEnterDeepFocus?.()
+                onStartFocus?.()
               }
             }
           : undefined
@@ -95,7 +90,10 @@ const StepRow = ({ step, isCurrent, onToggle, toggling, onEnterDeepFocus }) => {
             <div className="mt-3 flex gap-2" onClick={(e) => e.stopPropagation()}>
               <button
                 type="button"
-                onClick={() => onToggle(step.id, false)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onStartFocus?.()
+                }}
                 className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-[#3C6660] px-3 py-1.5 text-xs font-medium text-[#DCFFF8]"
               >
                 <img src={icon_pensil} alt="icon" width="12" height="12" />
@@ -127,6 +125,22 @@ const FocusPage = () => {
   const [activeTaskId, setActiveTaskId] = useState(null)
   const [toggling, setToggling] = useState(null)
   const navigate = useNavigate()
+
+  const handleStartFocus = async (taskId, stepId) => {
+    if (!taskId || !stepId) return
+    try {
+      await startFocusSession({
+        task_id: taskId,
+        step_id: stepId,
+        duration_minutes: 25,
+        session_notes: 'Focus session started from Focus page',
+      })
+      navigate('/DeepFocus', { state: { taskId, stepId } })
+    } catch (err) {
+      console.error('Start focus session error', err)
+      // Could set local state for visible messages if needed
+    }
+  }
 
   const focusId =
     activeTaskId ?? tasks.find((t) => t.micro_steps?.some((s) => !s.is_completed))?.id ?? tasks[0]?.id ?? null
@@ -200,9 +214,7 @@ const FocusPage = () => {
                 isCurrent={i === currentIdx}
                 toggling={toggling === step.id}
                 onToggle={handleToggle}
-                onEnterDeepFocus={() =>
-                  navigate('/DeepFocus', { state: { taskId: focusId, stepId: step.id } })
-                }
+                onStartFocus={() => handleStartFocus(focusId, step.id)}
               />
             ))}
           </div>
