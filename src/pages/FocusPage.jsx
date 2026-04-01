@@ -27,7 +27,7 @@ const CircleEmpty = ({ isCurrent }) => (
   />
 )
 
-const StepRow = ({ step, isCurrent, onToggle, toggling, onStartFocus }) => {
+const StepRow = ({ step, isCurrent, toggling, onStartFocus, onReAtomize, onMarkWorking }) => {
   const done = step.is_completed
   return (
     <div
@@ -57,7 +57,7 @@ const StepRow = ({ step, isCurrent, onToggle, toggling, onStartFocus }) => {
           type="button"
           onClick={(e) => {
             e.stopPropagation()
-            if (isCurrent) onToggle(step.id, step.is_completed)
+            if (isCurrent) onStartFocus?.()
           }}
           className={cn(
             'flex-shrink-0 border-none bg-transparent p-0',
@@ -86,12 +86,17 @@ const StepRow = ({ step, isCurrent, onToggle, toggling, onStartFocus }) => {
             {step.title}
           </p>
 
+          {step.description && (
+            <p className="mt-1 text-xs leading-relaxed text-text-muted">{step.description}</p>
+          )}
+
           {isCurrent && (
             <div className="mt-3 flex gap-2" onClick={(e) => e.stopPropagation()}>
               <button
                 type="button"
-                onClick={(e) => {
+                onClick={async (e) => {
                   e.stopPropagation()
+                  await onMarkWorking?.()
                   onStartFocus?.()
                 }}
                 className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-[#3C6660] px-3 py-1.5 text-xs font-medium text-[#DCFFF8]"
@@ -101,6 +106,10 @@ const StepRow = ({ step, isCurrent, onToggle, toggling, onStartFocus }) => {
               </button>
               <button
                 type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onReAtomize?.(step.id)
+                }}
                 className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-transparent px-3 py-1.5 text-xs font-medium text-text-secondary"
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -123,29 +132,36 @@ const StepRow = ({ step, isCurrent, onToggle, toggling, onStartFocus }) => {
 const FocusPage = () => {
   const { tasks, setTasks, loading, error, fetchTasks } = useTasks()
   const [activeTaskId, setActiveTaskId] = useState(null)
-  const [toggling, setToggling] = useState(null)
+  const [reAtomizing, setReAtomizing] = useState(null)
+  const [working, setWorking] = useState(null)
   const navigate = useNavigate()
 
   const handleStartFocus = async (taskId, stepId) => {
-    if (!taskId || !stepId) return
+    if (!taskId || !stepId) {
+      console.warn('Missing taskId or stepId', { taskId, stepId })
+      return
+    }
     try {
+      console.log('Starting focus session with:', { taskId, stepId })
       await startFocusSession({
         task_id: taskId,
         step_id: stepId,
         duration_minutes: 25,
         session_notes: 'Focus session started from Focus page',
       })
-      navigate('/DeepFocus', { state: { taskId, stepId } })
+      console.log('Focus session created, navigating...')
     } catch (err) {
-      console.error('Start focus session error', err)
-      // Could set local state for visible messages if needed
+      console.error('Start focus session error (continuing navigation anyway):', err)
+    } finally {
+      // Always navigate even if session creation fails
+      navigate('/DeepFocus', { state: { taskId, stepId } })
     }
   }
 
   const focusId =
     activeTaskId ?? tasks.find((t) => t.micro_steps?.some((s) => !s.is_completed))?.id ?? tasks[0]?.id ?? null
 
-  const { task, toggleStep } = useTaskDetail(String(focusId), tasks, setTasks)
+  const { task, markStepWorking, reAtomizeStep } = useTaskDetail(String(focusId), tasks, setTasks)
 
   const steps = task?.micro_steps ?? []
   const progress = task?.progress_percentage ?? 0
@@ -153,12 +169,21 @@ const FocusPage = () => {
   const currentIdx = steps.findIndex((s) => !s.is_completed)
   const complexStep = steps.find((s) => !s.is_completed && s.estimated_duration >= 30) ?? null
 
-  const handleToggle = async (stepId, currentIsCompleted) => {
-    setToggling(stepId)
+  const handleMarkWorking = async (stepId) => {
+    setWorking(stepId)
     try {
-      await toggleStep(stepId, currentIsCompleted)
+      await markStepWorking(stepId)
     } finally {
-      setToggling(null)
+      setWorking(null)
+    }
+  }
+
+  const handleReAtomize = async (stepId) => {
+    setReAtomizing(stepId)
+    try {
+      await reAtomizeStep(stepId)
+    } finally {
+      setReAtomizing(null)
     }
   }
 
@@ -212,9 +237,10 @@ const FocusPage = () => {
                 key={step.id}
                 step={step}
                 isCurrent={i === currentIdx}
-                toggling={toggling === step.id}
-                onToggle={handleToggle}
+                toggling={reAtomizing === step.id || working === step.id}
                 onStartFocus={() => handleStartFocus(focusId, step.id)}
+                onReAtomize={() => handleReAtomize(step.id)}
+                onMarkWorking={() => handleMarkWorking(step.id)}
               />
             ))}
           </div>

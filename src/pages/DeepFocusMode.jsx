@@ -2,7 +2,7 @@ import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useTasks from '../hooks/useTasks'
 import useTaskDetail from '../hooks/useTaskDetail'
-import { getActiveFocusSession, completeFocusSession } from '../services/focusService'
+import { getActiveFocusSession, completeFocusSession, cancelFocusSession, updateFocusSessionSettings } from '../services/focusService'
 import Spinner from '../components/atoms/Spinner'
 
 import tandaPanah from '../assets/tanda_panah.svg'
@@ -161,6 +161,7 @@ const DeepFocusPage = () => {
   const [draftWorkMin, setDraftWorkMin] = useState(Math.floor(initial.work / 60))
   const [draftBreakMin, setDraftBreakMin] = useState(Math.floor(initial.brk / 60))
   const [completing, setCompleting] = useState(false)
+  const [sessionError, setSessionError] = useState(null)
 
   const task = useMemo(
     () => tasks?.find((t) => String(t.id) === String(taskId)) ?? null,
@@ -203,7 +204,29 @@ const DeepFocusPage = () => {
     setSettingsOpen(true)
   }
 
-  const applySettings = () => {
+  const handleCompleteStep = async () => {
+    setCompleting(true)
+    try {
+      if (!currentSession?.session_id) {
+        throw new Error('No active focus session to complete')
+      }
+      await completeFocusSession(currentSession.session_id)
+      if (taskId != null && stepId != null) {
+        await toggleStep(stepId, false)
+      }
+      setCurrentSession(null)
+    } catch (err) {
+      setSessionError(err?.message || 'Failed to complete focus session')
+      console.error('Error completing session', err)
+    } finally {
+      setCompleting(false)
+      navigate('/focus')
+    }
+  }
+
+
+
+  const applySettings = async () => {
     const w = Math.max(1, Math.min(180, draftWorkMin)) * 60
     const b = Math.max(1, Math.min(60, draftBreakMin)) * 60
     setWorkTotal(w)
@@ -214,22 +237,14 @@ const DeepFocusPage = () => {
     dispatchTimer({ type: 'applyDurations', workSec: w })
     setIsRunning(false)
     setSettingsOpen(false)
-  }
 
-  const handleCompleteStep = async () => {
-    setCompleting(true)
-    try {
-      if (currentSession?.session_id) {
-        await completeFocusSession(currentSession.session_id)
+    if (currentSession?.session_id) {
+      try {
+        await updateFocusSessionSettings(currentSession.session_id, { duration_minutes: Math.round(w / 60) })
+      } catch (err) {
+        console.error('Error updating session settings', err)
+        setSessionError(err?.message || 'Failed to update session settings')
       }
-      if (taskId != null && stepId != null) {
-        await toggleStep(stepId, false)
-      }
-    } catch (err) {
-      console.error('Error completing session', err)
-    } finally {
-      setCompleting(false)
-      navigate('/focus')
     }
   }
 
@@ -279,6 +294,10 @@ const DeepFocusPage = () => {
           {objectiveOneLine}
         </p>
 
+        {sessionError && (
+          <p className="mb-3 text-center text-sm font-medium text-red-600">{sessionError}</p>
+        )}
+
         {/* kotak.svg di belakang area timer */}
         <div className="relative mb-6 flex h-[min(85vw,320px)] w-[min(85vw,320px)] shrink-0 items-center justify-center sm:mb-8 sm:h-[min(52vh,340px)] sm:w-[min(52vh,340px)] md:h-[min(48vh,380px)] md:w-[min(48vh,380px)]">
           <img
@@ -286,7 +305,7 @@ const DeepFocusPage = () => {
             alt=""
             className="pointer-events-none absolute inset-0 m-auto h-full w-full object-contain opacity-90"
           />
-          <div className="relative z-10 flex h-[220px] w-[220px] items-center justify-center rounded-full bg-gray-400/20">
+          <div className="relative z-10 flex h-55 w-[220px] items-center justify-center rounded-full bg-gray-400/20">
             <TimerRing phase={phase} progress={progress} />
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
               <span className="text-5xl font-semibold tracking-tight text-[#2D3632] sm:text-6xl">
@@ -360,16 +379,19 @@ const DeepFocusPage = () => {
           </button>
         </div>
 
-        <button
-          type="button"
-          onClick={handleCompleteStep}
-          disabled={completing}
-          className="mb-10 flex items-center gap-2 rounded-full border border-gray-200 bg-white px-6 py-3 text-sm font-medium shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-50"
-          style={{ color: '#5C605C' }}
-        >
-          <img src={ceklisIcon} alt="" className="h-5 w-5 object-contain" />
-          {completing ? 'Menyimpan...' : 'Mark as Done'}
-        </button>
+        <div className="mb-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-center">
+          <button
+            type="button"
+            onClick={handleCompleteStep}
+            disabled={completing}
+            className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-6 py-3 text-sm font-medium shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-50"
+            style={{ color: '#5C605C' }}
+          >
+            <img src={ceklisIcon} alt="" className="h-5 w-5 object-contain" />
+            {completing ? 'Menyimpan...' : 'Mark as Done'}
+          </button>
+
+        </div>
 
         <div className="flex items-center gap-3">
           <div className="flex items-center pl-1">
@@ -403,6 +425,7 @@ const DeepFocusPage = () => {
           <p>Keep the tone academic yet accessible.</p>
         </div>
       </footer>
+
       {settingsOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
