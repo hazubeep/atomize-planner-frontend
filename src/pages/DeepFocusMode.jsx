@@ -2,7 +2,12 @@ import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useTasks from '../hooks/useTasks'
 import useTaskDetail from '../hooks/useTaskDetail'
-import { getActiveFocusSession, completeFocusSession, cancelFocusSession, updateFocusSessionSettings } from '../services/focusService'
+import {
+  getActiveFocusSession,
+  completeFocusSession,
+  cancelFocusSession,
+  updateFocusSessionSettings,
+} from '../services/focusService'
 import Spinner from '../components/atoms/Spinner'
 
 import tandaPanah from '../assets/tanda_panah.svg'
@@ -36,9 +41,7 @@ function splitIntoTwoParagraphs(text) {
   const t = (text || '').trim()
   if (!t) return ['', '']
   const cut = t.indexOf('. ')
-  if (cut > 0 && cut < t.length - 2) {
-    return [t.slice(0, cut + 1), t.slice(cut + 2)]
-  }
+  if (cut > 0 && cut < t.length - 2) return [t.slice(0, cut + 1), t.slice(cut + 2)]
   const mid = Math.ceil(t.length / 2)
   const sp = t.lastIndexOf(' ', mid)
   if (sp > 8) return [t.slice(0, sp), t.slice(sp + 1)]
@@ -59,7 +62,6 @@ function TimerRing({ phase, progress, gradientId = 'deepFocusRingGrad' }) {
   const isBreak = phase === 'break'
   const dashOffset = RING_C * (1 - progress)
   const stroke = isBreak ? '#EAB308' : `url(#${gradientId})`
-
   return (
     <svg width="220" height="220" viewBox="0 0 200 200" className="-rotate-90" aria-hidden>
       <defs>
@@ -70,41 +72,24 @@ function TimerRing({ phase, progress, gradientId = 'deepFocusRingGrad' }) {
       </defs>
       <circle cx="100" cy="100" r={RING_R} fill="none" stroke="rgba(120,120,120,0.25)" strokeWidth="10" />
       <circle
-        cx="100"
-        cy="100"
-        r={RING_R}
-        fill="none"
-        stroke={stroke}
-        strokeWidth="10"
-        strokeLinecap="round"
-        strokeDasharray={RING_C}
-        strokeDashoffset={dashOffset}
+        cx="100" cy="100" r={RING_R} fill="none" stroke={stroke} strokeWidth="10"
+        strokeLinecap="round" strokeDasharray={RING_C} strokeDashoffset={dashOffset}
         className="transition-[stroke-dashoffset] duration-300 ease-linear"
       />
     </svg>
   )
 }
 
-/** Pure reducer so React Strict Mode (double-invoke) cannot flip work→break→work in one tick. */
 function timerReducer(state, action) {
   switch (action.type) {
     case 'tick': {
       const { workSec, breakSec } = action
-      if (state.secondsLeft > 1) {
-        return { ...state, secondsLeft: state.secondsLeft - 1 }
-      }
-      if (state.phase === 'work') {
-        return { phase: 'break', secondsLeft: breakSec }
-      }
+      if (state.secondsLeft > 1) return { ...state, secondsLeft: state.secondsLeft - 1 }
+      if (state.phase === 'work') return { phase: 'break', secondsLeft: breakSec }
       return { phase: 'work', secondsLeft: workSec }
     }
-    case 'resetSegment': {
-      const { workSec, breakSec } = action
-      return {
-        ...state,
-        secondsLeft: state.phase === 'work' ? workSec : breakSec,
-      }
-    }
+    case 'resetSegment':
+      return { ...state, secondsLeft: state.phase === 'work' ? action.workSec : action.breakSec }
     case 'applyDurations':
       return { phase: 'work', secondsLeft: action.workSec }
     default:
@@ -123,13 +108,16 @@ const DeepFocusPage = () => {
 
   const [currentSession, setCurrentSession] = useState(null)
   const [sessionLoading, setSessionLoading] = useState(true)
+  const [sessionError, setSessionError] = useState(null)
+  const [completing, setCompleting] = useState(false)
+  const [cancelling, setCancelling] = useState(false)
 
   useEffect(() => {
     const loadActive = async () => {
       setSessionLoading(true)
       try {
         const res = await getActiveFocusSession()
-        setCurrentSession(res.data)
+        setCurrentSession(res?.data ?? null)
       } catch {
         setCurrentSession(null)
       } finally {
@@ -144,38 +132,32 @@ const DeepFocusPage = () => {
   const [breakTotal, setBreakTotal] = useState(initial.brk)
   const workRef = useRef(initial.work)
   const breakRef = useRef(initial.brk)
-  useEffect(() => {
-    workRef.current = workTotal
-  }, [workTotal])
-  useEffect(() => {
-    breakRef.current = breakTotal
-  }, [breakTotal])
+  useEffect(() => { workRef.current = workTotal }, [workTotal])
+  useEffect(() => { breakRef.current = breakTotal }, [breakTotal])
 
-  const [timer, dispatchTimer] = useReducer(timerReducer, {
-    phase: 'work',
-    secondsLeft: initial.work,
-  })
+  const [timer, dispatchTimer] = useReducer(timerReducer, { phase: 'work', secondsLeft: initial.work })
   const { phase, secondsLeft } = timer
   const [isRunning, setIsRunning] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [draftWorkMin, setDraftWorkMin] = useState(Math.floor(initial.work / 60))
   const [draftBreakMin, setDraftBreakMin] = useState(Math.floor(initial.brk / 60))
-  const [completing, setCompleting] = useState(false)
-  const [sessionError, setSessionError] = useState(null)
 
   const task = useMemo(
     () => tasks?.find((t) => String(t.id) === String(taskId)) ?? null,
     [tasks, taskId]
   )
+
+  // use task_steps (API v4) with fallback to micro_steps
   const currentStep = useMemo(() => {
-    if (!task?.micro_steps || stepId == null) return null
-    return task.micro_steps.find((s) => String(s.id) === String(stepId)) ?? null
+    if (!task || stepId == null) return null
+    const steps = task.task_steps ?? task.micro_steps ?? []
+    return steps.find((s) => String(s.id) === String(stepId)) ?? null
   }, [task, stepId])
 
-  const objectiveRaw =
-    currentStep?.title ||
-    'Draft 200 words for the introduction. Clarify the core argument and how it connects to your thesis.'
+  // session notes: prefer from active session, fallback to step description
+  const sessionNotes = currentSession?.session_notes || currentStep?.description || null
 
+  const objectiveRaw = currentSession?.objective || currentStep?.title || 'Focus on your current task.'
   const [p1, p2] = splitIntoTwoParagraphs(objectiveRaw)
   const objectiveOneLine = [p1, p2].filter(Boolean).join(' ')
 
@@ -185,17 +167,45 @@ const DeepFocusPage = () => {
   useEffect(() => {
     if (!isRunning) return
     const id = setInterval(() => {
-      dispatchTimer({
-        type: 'tick',
-        workSec: workRef.current,
-        breakSec: breakRef.current,
-      })
+      dispatchTimer({ type: 'tick', workSec: workRef.current, breakSec: breakRef.current })
     }, 1000)
     return () => clearInterval(id)
   }, [isRunning])
 
-  const handleReset = () => {
+  const handleReset = async () => {
+    setIsRunning(false)
     dispatchTimer({ type: 'resetSegment', workSec: workTotal, breakSec: breakTotal })
+    if (currentSession?.session_id) {
+      setCancelling(true)
+      try {
+        await cancelFocusSession(currentSession.session_id, 'Timer reset by user')
+        setCurrentSession(null)
+      } catch (err) {
+        console.error('Cancel session error:', err)
+      } finally {
+        setCancelling(false)
+      }
+    }
+  }
+
+  const handleCompleteStep = async () => {
+    setCompleting(true)
+    setSessionError(null)
+    try {
+      if (currentSession?.session_id) {
+        await completeFocusSession(currentSession.session_id)
+      }
+      if (taskId != null && stepId != null) {
+        await toggleStep(stepId, false)
+      }
+      setCurrentSession(null)
+      navigate('/focus')
+    } catch (err) {
+      const msg = err?.error?.message || err?.message || 'Failed to complete focus session'
+      setSessionError(msg)
+    } finally {
+      setCompleting(false)
+    }
   }
 
   const openSettings = () => {
@@ -203,28 +213,6 @@ const DeepFocusPage = () => {
     setDraftBreakMin(Math.floor(breakTotal / 60))
     setSettingsOpen(true)
   }
-
-  const handleCompleteStep = async () => {
-    setCompleting(true)
-    try {
-      if (!currentSession?.session_id) {
-        throw new Error('No active focus session to complete')
-      }
-      await completeFocusSession(currentSession.session_id)
-      if (taskId != null && stepId != null) {
-        await toggleStep(stepId, false)
-      }
-      setCurrentSession(null)
-    } catch (err) {
-      setSessionError(err?.message || 'Failed to complete focus session')
-      console.error('Error completing session', err)
-    } finally {
-      setCompleting(false)
-      navigate('/focus')
-    }
-  }
-
-
 
   const applySettings = async () => {
     const w = Math.max(1, Math.min(180, draftWorkMin)) * 60
@@ -242,23 +230,17 @@ const DeepFocusPage = () => {
       try {
         await updateFocusSessionSettings(currentSession.session_id, { duration_minutes: Math.round(w / 60) })
       } catch (err) {
-        console.error('Error updating session settings', err)
-        setSessionError(err?.message || 'Failed to update session settings')
+        setSessionError(err?.error?.message || err?.message || 'Failed to update session settings')
       }
     }
   }
 
   if (sessionLoading) {
-    return (
-      <div className="flex justify-center py-20">
-        <Spinner size="lg" />
-      </div>
-    )
+    return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
   }
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-[#F8F9F8] font-sans text-[#333]">
-
       <header className="sticky top-0 z-30 flex w-full shrink-0 items-center justify-between border-b border-black/5 bg-[#F8F9F8]/95 py-2.5 pl-3 pr-3 backdrop-blur-sm sm:pl-4 sm:pr-4">
         <button
           type="button"
@@ -283,10 +265,7 @@ const DeepFocusPage = () => {
       </header>
 
       <main className="flex w-full flex-1 flex-col items-center px-5 pt-6 sm:px-8 md:pt-8">
-        <p
-          className="mb-4 text-center text-[10px] font-medium uppercase tracking-[0.2em]"
-          style={{ color: '#6b7280' }}
-        >
+        <p className="mb-4 text-center text-[10px] font-medium uppercase tracking-[0.2em]" style={{ color: '#6b7280' }}>
           Current Objective
         </p>
 
@@ -298,13 +277,8 @@ const DeepFocusPage = () => {
           <p className="mb-3 text-center text-sm font-medium text-red-600">{sessionError}</p>
         )}
 
-        {/* kotak.svg di belakang area timer */}
         <div className="relative mb-6 flex h-[min(85vw,320px)] w-[min(85vw,320px)] shrink-0 items-center justify-center sm:mb-8 sm:h-[min(52vh,340px)] sm:w-[min(52vh,340px)] md:h-[min(48vh,380px)] md:w-[min(48vh,380px)]">
-          <img
-            src={kotakFrame}
-            alt=""
-            className="pointer-events-none absolute inset-0 m-auto h-full w-full object-contain opacity-90"
-          />
+          <img src={kotakFrame} alt="" className="pointer-events-none absolute inset-0 m-auto h-full w-full object-contain opacity-90" />
           <div className="relative z-10 flex h-55 w-[220px] items-center justify-center rounded-full bg-gray-400/20">
             <TimerRing phase={phase} progress={progress} />
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
@@ -323,7 +297,8 @@ const DeepFocusPage = () => {
           <button
             type="button"
             onClick={handleReset}
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-sm transition-colors hover:bg-gray-50"
+            disabled={cancelling}
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-50"
             aria-label="Reset timer"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -338,26 +313,12 @@ const DeepFocusPage = () => {
             className="flex shrink-0 items-center gap-2.5 rounded-full bg-[#305954] px-7 py-3 shadow-md transition-all hover:bg-[#264643]"
           >
             {isRunning ? (
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="shrink-0 text-[#DCFFF8]"
-                aria-hidden
-              >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="shrink-0 text-[#DCFFF8]" aria-hidden>
                 <rect x="6" y="5" width="5" height="14" rx="1" />
                 <rect x="13" y="5" width="5" height="14" rx="1" />
               </svg>
             ) : (
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="shrink-0 text-[#DCFFF8]"
-                aria-hidden
-              >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="shrink-0 text-[#DCFFF8]" aria-hidden>
                 <path d="M8 5v14l11-7z" />
               </svg>
             )}
@@ -370,7 +331,7 @@ const DeepFocusPage = () => {
             type="button"
             onClick={openSettings}
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-sm transition-colors hover:bg-gray-50"
-            aria-label="Pengaturan timer"
+            aria-label="Timer settings"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="3" />
@@ -388,9 +349,8 @@ const DeepFocusPage = () => {
             style={{ color: '#5C605C' }}
           >
             <img src={ceklisIcon} alt="" className="h-5 w-5 object-contain" />
-            {completing ? 'Menyimpan...' : 'Mark as Done'}
+            {completing ? 'Saving...' : 'Mark as Done'}
           </button>
-
         </div>
 
         <div className="flex items-center gap-3">
@@ -399,91 +359,49 @@ const DeepFocusPage = () => {
               <img src={personIcon} alt="" className="h-6 w-6 object-contain opacity-70" />
             </div>
             <div className="relative z-[1] -ml-3 flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-[#1a6b5a]">
-              <img
-                src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&h=100&fit=crop"
-                alt=""
-                className="h-full w-full object-cover"
-              />
-              <span className="pointer-events-none absolute bottom-0.5 right-0.5 rounded bg-[#1a6b5a] px-1 text-[8px] font-bold leading-none text-white ring-1 ring-white">
-                +12
-              </span>
+              <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&h=100&fit=crop" alt="" className="h-full w-full object-cover" />
+              <span className="pointer-events-none absolute bottom-0.5 right-0.5 rounded bg-[#1a6b5a] px-1 text-[8px] font-bold leading-none text-white ring-1 ring-white">+12</span>
             </div>
           </div>
-          <p className="text-xs font-medium text-gray-500">12 other are focusing right now</p>
+          <p className="text-xs font-medium text-gray-500">12 others are focusing right now</p>
         </div>
       </main>
 
-      <footer
-          className="mt-auto border-t border-black/5 bg-[#F8F9F8] py-6 pl-5 pr-5 sm:py-8 sm:pl-10 sm:pr-8 md:pl-16"
-          style={{ color: '#5C605C' }}
-      >
+      <footer className="mt-auto border-t border-black/5 bg-[#F8F9F8] py-6 pl-5 pr-5 sm:py-8 sm:pl-10 sm:pr-8 md:pl-16" style={{ color: '#5C605C' }}>
         <h3 className="mb-3 text-left font-['Inter',sans-serif] text-xs font-bold uppercase tracking-wide sm:text-sm">
           SESSION NOTES
         </h3>
         <div className="max-w-4xl space-y-3 text-left font-['Inter',sans-serif] text-sm leading-relaxed sm:text-base">
-          <p>Focus on the clarity of the opening sentence.</p>
-          <p>Keep the tone academic yet accessible.</p>
+          {sessionNotes
+            ? <p>{sessionNotes}</p>
+            : <p className="text-gray-400 italic">No session notes.</p>
+          }
         </div>
       </footer>
 
       {settingsOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="deep-focus-settings-title"
-        >
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby="deep-focus-settings-title">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-            <h2 id="deep-focus-settings-title" className="mb-1 text-lg font-semibold text-gray-900">
-              Timer settings
-            </h2>
-            <p className="mb-5 text-sm text-gray-500">Ubah durasi fokus dan istirahat (tersimpan di perangkat ini).</p>
+            <h2 id="deep-focus-settings-title" className="mb-1 text-lg font-semibold text-gray-900">Timer settings</h2>
+            <p className="mb-5 text-sm text-gray-500">Adjust focus and break duration.</p>
             <div className="space-y-4">
               <label className="block">
-                <span className="mb-1 block text-xs font-medium text-gray-700">Focus (menit)</span>
-                <input
-                  type="number"
-                  min={1}
-                  max={180}
-                  value={draftWorkMin}
-                  onChange={(e) => setDraftWorkMin(Number(e.target.value))}
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm"
-                />
+                <span className="mb-1 block text-xs font-medium text-gray-700">Focus (minutes)</span>
+                <input type="number" min={1} max={180} value={draftWorkMin} onChange={(e) => setDraftWorkMin(Number(e.target.value))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm" />
               </label>
               <label className="block">
-                <span className="mb-1 block text-xs font-medium text-gray-700">Break (menit)</span>
-                <input
-                  type="number"
-                  min={1}
-                  max={60}
-                  value={draftBreakMin}
-                  onChange={(e) => setDraftBreakMin(Number(e.target.value))}
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm"
-                />
+                <span className="mb-1 block text-xs font-medium text-gray-700">Break (minutes)</span>
+                <input type="number" min={1} max={60} value={draftBreakMin} onChange={(e) => setDraftBreakMin(Number(e.target.value))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm" />
               </label>
             </div>
             <div className="mt-6 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setSettingsOpen(false)}
-                className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                Batal
-              </button>
-              <button
-                type="button"
-                onClick={applySettings}
-                className="rounded-xl bg-[#305954] px-4 py-2 text-sm font-medium text-white hover:bg-[#264643]"
-              >
-                Simpan
-              </button>
+              <button type="button" onClick={() => setSettingsOpen(false)} className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
+              <button type="button" onClick={applySettings} className="rounded-xl bg-[#305954] px-4 py-2 text-sm font-medium text-white hover:bg-[#264643]">Save</button>
             </div>
           </div>
         </div>
-
       )}
     </div>
-
   )
 }
 

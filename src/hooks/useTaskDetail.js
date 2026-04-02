@@ -1,35 +1,25 @@
 import { useState, useCallback } from 'react'
-import { toggleMicroStep } from '../services/microStepService'
-import { getTaskDetail, markStepWorking as markStepWorkingApi, reAtomizeStep as reAtomizeTaskStep } from '../services/taskService'
+import { toggleTaskStep, markStepWorking as markStepWorkingApi, reAtomizeStep as reAtomizeStepApi, getTaskDetail } from '../services/taskService'
 
 const useTaskDetail = (taskId, tasks, setTasks) => {
   const [error, setError] = useState(null)
 
   const task = tasks?.find((t) => String(t.id) === String(taskId)) ?? null
 
-  const refreshTaskInState = useCallback(
-    async () => {
-      try {
-        const detail = await getTaskDetail(taskId)
-        const taskData = detail?.data ?? detail
-        if (!taskData) return
-        setTasks((prev) =>
-          prev.map((t) =>
-            String(t.id) !== String(taskId)
-              ? t
-              : {
-                  ...t,
-                  ...taskData,
-                  micro_steps: taskData.micro_steps || taskData.task_steps || [],
-                  task_steps: taskData.task_steps || taskData.micro_steps || [],
-                }
-          )
+  const refreshTaskInState = useCallback(async () => {
+    try {
+      const res = await getTaskDetail(taskId)
+      const taskData = res?.data ?? res
+      if (!taskData) return
+      setTasks((prev) =>
+        prev.map((t) =>
+          String(t.id) !== String(taskId) ? t : { ...t, ...taskData, task_steps: taskData.task_steps || [] }
         )
-      } catch {
-        // ignore refresh failure; error state already handled by caller
-      }
-    },    [taskId, setTasks]
-  )
+      )
+    } catch {
+      // ignore refresh failure
+    }
+  }, [taskId, setTasks])
 
   const toggleStep = useCallback(
     async (stepId, currentIsCompleted) => {
@@ -39,39 +29,37 @@ const useTaskDetail = (taskId, tasks, setTasks) => {
       setTasks((prev) =>
         prev.map((t) => {
           if (String(t.id) !== String(taskId)) return t
-          const steps = t.micro_steps || t.task_steps || []
+          const steps = t.task_steps || []
           const updatedSteps = steps.map((s) =>
-            String(s.id) === String(stepId) ? { ...s, is_completed: newCompleted } : s
+            String(s.id) === String(stepId) ? { ...s, is_completed: newCompleted, status: newCompleted ? 'completed' : 'pending' } : s
           )
           const done = updatedSteps.filter((s) => s.is_completed).length
-          const progress = updatedSteps.length ? Math.round((done / updatedSteps.length) * 100) : 0
           return {
             ...t,
-            micro_steps: updatedSteps,
             task_steps: updatedSteps,
-            progress_percentage: progress,
+            completed_steps: done,
+            progress_percentage: updatedSteps.length ? Math.round((done / updatedSteps.length) * 100) : 0,
           }
         })
       )
       try {
-        await toggleMicroStep(taskId, stepId, newCompleted)
+        await toggleTaskStep(taskId, stepId, newCompleted)
         await refreshTaskInState()
       } catch (err) {
         // Revert on error
         setTasks((prev) =>
           prev.map((t) => {
             if (String(t.id) !== String(taskId)) return t
-            const steps = t.micro_steps || t.task_steps || []
+            const steps = t.task_steps || []
             const revertedSteps = steps.map((s) =>
               String(s.id) === String(stepId) ? { ...s, is_completed: currentIsCompleted } : s
             )
             const done = revertedSteps.filter((s) => s.is_completed).length
-            const progress = revertedSteps.length ? Math.round((done / revertedSteps.length) * 100) : 0
             return {
               ...t,
-              micro_steps: revertedSteps,
               task_steps: revertedSteps,
-              progress_percentage: progress,
+              completed_steps: done,
+              progress_percentage: revertedSteps.length ? Math.round((done / revertedSteps.length) * 100) : 0,
             }
           })
         )
@@ -100,7 +88,7 @@ const useTaskDetail = (taskId, tasks, setTasks) => {
     async (stepId, context_hint = '') => {
       setError(null)
       try {
-        await reAtomizeTaskStep(taskId, stepId, context_hint)
+        await reAtomizeStepApi(taskId, stepId, context_hint)
         await refreshTaskInState()
       } catch (err) {
         setError(err.message)
