@@ -45,10 +45,15 @@ const MainLayout = ({ children }) => {
     }
   }, [profileOpen])
 
-  const handleLogout = () => {
-    logout()
-    setProfileOpen(false)
-    navigate('/register', { replace: true })
+  const handleLogout = async () => {
+    try {
+      await logout()
+    } catch (err) {
+      console.error('Logout error', err)
+    } finally {
+      setProfileOpen(false)
+      navigate('/register', { replace: true })
+    }
   }
 
   return (

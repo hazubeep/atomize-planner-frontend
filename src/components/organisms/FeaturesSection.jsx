@@ -24,8 +24,8 @@ const features = [
 
 const FeaturesSection = () => (
   <div id="features" className="bg-bg">
-    <Section className="py-[clamp(96px,8.5vw,150px)]">
-      <div className="grid items-center gap-[clamp(44px,6vw,96px)] grid-cols-[0.9fr_1.1fr]">
+    <Section className="py-10">
+      <div className="flex flex-col items-center gap-[clamp(30px,4vw,60px)] md:grid md:items-center md:grid-cols-[0.9fr_1.1fr]">
         <div>
           <h2 className="mb-[clamp(28px,3.2vw,60px)] font-display text-[clamp(36px,3.6vw,64px)] font-normal leading-[1.02] text-text-primary">
             Core Sanctuary Features
@@ -47,7 +47,7 @@ const FeaturesSection = () => (
           </div>
         </div>
 
-        <div className="relative flex justify-end">
+        <div className="relative hidden md:flex md:justify-end">
           <img
             src={laptopImg}
             alt="workspace"

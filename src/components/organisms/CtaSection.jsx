@@ -4,7 +4,7 @@ import Section from '../atoms/Section'
 const CtaSection = () => {
   const navigate = useNavigate()
   return (
-    <div className="py-24 pb-30">
+    <div className="py-10 pb-8">
       <Section>
         <div className="relative overflow-hidden rounded-[24px] bg-[#3C6660] px-10 py-19.5 text-center">
           {/* Quarter-circle ornaments: white @ 90% transparency (10% opacity) */}
@@ -18,7 +18,7 @@ const CtaSection = () => {
           />
 
           <div className="relative z-1">
-            <h2 className="mb-4.5 font-display text-5xl font-normal leading-[1.15] text-[#DCFFF8]">
+            <h2 className="mb-4.5 font-display text-[clamp(32px,4vw,48px)] md:text-5xl font-normal leading-[1.15] text-[#DCFFF8]">
               Start Your First
               <br />
               Atomized Task Today

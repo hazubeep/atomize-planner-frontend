@@ -33,7 +33,7 @@ const steps = [
 ]
 
 const ProcessSection = () => (
-  <div id="methodology" className="bg-bg py-24">
+  <div id="methodology" className="bg-bg py-10">
     <Section>
       <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-text-muted">How it works</p>
       <h2 className="mb-2 font-display text-4xl font-normal text-text-primary">The Atomization Process</h2>
@@ -41,12 +41,12 @@ const ProcessSection = () => (
         Complexity is the enemy of execution. We dismantle obstacles using our signature three-stage ritual.
       </p>
 
-      <div className="grid gap-5 [grid-template-columns:4fr_5fr_3fr]">
+      <div className="grid gap-3 grid-cols-1 md:[grid-template-columns:4fr_5fr_3fr]">
         {steps.map((s) => (
           <div
             key={s.num}
             className={cn(
-              'flex min-h-[320px] flex-col overflow-hidden rounded-[20px] p-8 px-7',
+              'flex flex-col overflow-hidden rounded-[20px] p-6 px-8',
               s.active ? 'border-transparent bg-accent-dark' : 'border border-border bg-bg'
             )}
           >
@@ -77,7 +77,7 @@ const ProcessSection = () => (
                 s.imgAlign === 'flex-end' ? 'justify-end' : s.active ? 'justify-center' : 'justify-start'
               )}
             >
-              {s.img && <img src={s.img} alt="" className={s.imgClassName} />}
+              {s.img && <img src={s.img} alt="" className={cn(s.imgClassName, 'hidden md:block')} />}
             </div>
           </div>
         ))}
