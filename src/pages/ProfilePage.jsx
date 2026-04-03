@@ -21,9 +21,9 @@ const ProfilePage = () => {
   const [email, setEmail] = useState('')
 
   const [currentPassword, setCurrentPassword] = useState('')
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
@@ -82,12 +82,12 @@ const ProfilePage = () => {
       showFeedback('Nama lengkap dan email harus diisi.', true)
       return
     }
-    if (newPassword && newPassword !== confirmPassword) {
-      showFeedback('New password dan confirm password tidak cocok.', true)
+    if (newPassword && !currentPassword) {
+      showFeedback('Current password harus diisi untuk mengubah password.', true)
       return
     }
-    if (newPassword && !currentPassword) {
-      showFeedback('Masukkan current password untuk mengganti password.', true)
+    if (newPassword && newPassword !== confirmPassword) {
+      showFeedback('New password dan confirm password tidak cocok.', true)
       return
     }
 
@@ -146,7 +146,7 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="pb-8 pt-6">
+    <div className="pb-24 pt-6">
       <h1 className="text-2xl font-semibold text-text-primary">Profile Setting</h1>
       <p className="mt-2 text-sm text-text-secondary">Adjust your personal preferences and account security.</p>
 
@@ -203,46 +203,44 @@ const ProfilePage = () => {
               <h3 className="text-lg font-semibold">Security</h3>
             </div>
             <p className="mb-4 text-xs text-text-muted">Leave password fields empty if you don't want to change it.</p>
-            <div className="space-y-4">
-              <div className="relative">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="relative sm:col-span-2">
                 <Input label="Current Password" type={showCurrentPassword ? 'text' : 'password'} value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="bg-white border border-[#E0E4DE] pr-10" />
                 <button type="button" onClick={() => setShowCurrentPassword((v) => !v)} className="absolute right-3 top-[38px] text-sm text-text-muted">
                   {showCurrentPassword ? '🙈' : '👁'}
                 </button>
               </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="relative">
-                  <Input label="New Password" type={showNewPassword ? 'text' : 'password'} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="bg-white border border-[#E0E4DE] pr-10" />
-                  <button type="button" onClick={() => setShowNewPassword((v) => !v)} className="absolute right-3 top-[38px] text-sm text-text-muted">
-                    {showNewPassword ? '🙈' : '👁'}
-                  </button>
-                </div>
-                <div className="relative">
-                  <Input label="Confirm New Password" type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="bg-white border border-[#E0E4DE] pr-10" />
-                  <button type="button" onClick={() => setShowConfirmPassword((v) => !v)} className="absolute right-3 top-[38px] text-sm text-text-muted">
-                    {showConfirmPassword ? '🙈' : '👁'}
-                  </button>
-                </div>
+              <div className="relative">
+                <Input label="New Password" type={showNewPassword ? 'text' : 'password'} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="bg-white border border-[#E0E4DE] pr-10" />
+                <button type="button" onClick={() => setShowNewPassword((v) => !v)} className="absolute right-3 top-[38px] text-sm text-text-muted">
+                  {showNewPassword ? '🙈' : '👁'}
+                </button>
+              </div>
+              <div className="relative">
+                <Input label="Confirm New Password" type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="bg-white border border-[#E0E4DE] pr-10" />
+                <button type="button" onClick={() => setShowConfirmPassword((v) => !v)} className="absolute right-3 top-[38px] text-sm text-text-muted">
+                  {showConfirmPassword ? '🙈' : '👁'}
+                </button>
               </div>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-between">
-            <button
-              type="button"
-              onClick={() => setDeleteModalOpen(true)}
-              className="rounded-lg border border-red-400 bg-white px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50"
-            >
-              Delete Account
-            </button>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <button
               type="button"
               onClick={handleSaveChanges}
               disabled={saving}
-              className="rounded-lg bg-[#3C6660] px-5 py-2 text-sm font-semibold text-[#DCFFF8] transition hover:brightness-90 disabled:opacity-60"
+              className="w-full rounded-lg bg-[#3C6660] px-5 py-2 text-sm font-semibold text-[#DCFFF8] transition hover:brightness-90 disabled:opacity-60 sm:w-auto"
             >
               {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setDeleteModalOpen(true)}
+              className="w-full rounded-lg border border-red-400 bg-white px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 sm:w-auto"
+            >
+              Delete Account
             </button>
           </div>
         </div>

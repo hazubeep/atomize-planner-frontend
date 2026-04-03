@@ -15,6 +15,7 @@ import saveIcon from '../assets/save.svg'
 import ceklisIcon from '../assets/ceklis.svg'
 import personIcon from '../assets/person.svg'
 import kotakFrame from '../assets/kotak_abu_abu.svg'
+import pengaturanIcon from '../assets/pengaturan_icon.svg'
 
 const LS_WORK = 'deepFocus_workSec'
 const LS_BREAK = 'deepFocus_breakSec'
@@ -293,12 +294,14 @@ const DeepFocusPage = () => {
           <p className="mb-4 text-center text-xs font-semibold text-amber-700">Break time — stretch and reset</p>
         )}
 
-        <div className="mb-8 flex flex-wrap items-center justify-center gap-3">
+        {/* Reset + Start Session + Settings */}
+        {/* Desktop: satu baris | Mobile: Reset+Settings atas, Start+Done bawah */}
+        <div className="mb-5 hidden items-center justify-center gap-4 sm:flex">
           <button
             type="button"
             onClick={handleReset}
             disabled={cancelling}
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-50"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-50"
             aria-label="Reset timer"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -306,11 +309,10 @@ const DeepFocusPage = () => {
               <path d="M3 3v5h5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
-
           <button
             type="button"
             onClick={() => setIsRunning((v) => !v)}
-            className="flex shrink-0 items-center gap-2.5 rounded-full bg-[#305954] px-7 py-3 shadow-md transition-all hover:bg-[#264643]"
+            className="flex shrink-0 items-center justify-center gap-2.5 rounded-full bg-[#305954] px-8 py-3.5 shadow-md transition-all hover:bg-[#264643]"
           >
             {isRunning ? (
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="shrink-0 text-[#DCFFF8]" aria-hidden>
@@ -326,32 +328,70 @@ const DeepFocusPage = () => {
               {isRunning ? 'Pause Session' : 'Start Session'}
             </span>
           </button>
-
           <button
             type="button"
             onClick={openSettings}
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-sm transition-colors hover:bg-gray-50"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm transition-colors hover:bg-gray-50"
             aria-label="Timer settings"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="3" />
-              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-            </svg>
+            <img src={pengaturanIcon} alt="settings" className="h-5 w-5 object-contain" />
           </button>
         </div>
 
-        <div className="mb-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-center">
+        {/* Mobile: Reset + Settings */}
+        <div className="mb-4 flex items-center justify-center gap-4 sm:hidden">
           <button
             type="button"
-            onClick={handleCompleteStep}
-            disabled={completing}
-            className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-6 py-3 text-sm font-medium shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-50"
-            style={{ color: '#5C605C' }}
+            onClick={handleReset}
+            disabled={cancelling}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-50"
+            aria-label="Reset timer"
           >
-            <img src={ceklisIcon} alt="" className="h-5 w-5 object-contain" />
-            {completing ? 'Saving...' : 'Mark as Done'}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" strokeLinecap="round" />
+              <path d="M3 3v5h5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={openSettings}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm transition-colors hover:bg-gray-50"
+            aria-label="Timer settings"
+          >
+            <img src={pengaturanIcon} alt="settings" className="h-5 w-5 object-contain" />
           </button>
         </div>
+
+        {/* Mobile: Start Session + Mark as Done */}
+        <button
+          type="button"
+          onClick={() => setIsRunning((v) => !v)}
+          className="mb-4 flex w-full max-w-xs shrink-0 items-center justify-center gap-2.5 rounded-full bg-[#305954] py-3.5 shadow-md transition-all hover:bg-[#264643] sm:hidden"
+        >
+          {isRunning ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="shrink-0 text-[#DCFFF8]" aria-hidden>
+              <rect x="6" y="5" width="5" height="14" rx="1" />
+              <rect x="13" y="5" width="5" height="14" rx="1" />
+            </svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="shrink-0 text-[#DCFFF8]" aria-hidden>
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          )}
+          <span className="text-sm font-medium leading-none text-[#DCFFF8]">
+            {isRunning ? 'Pause Session' : 'Start Session'}
+          </span>
+        </button>
+        <button
+          type="button"
+          onClick={handleCompleteStep}
+          disabled={completing}
+          className="mb-8 flex w-full max-w-xs items-center justify-center gap-2 rounded-full border border-gray-200 bg-white py-3.5 text-sm font-medium shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-50"
+          style={{ color: '#5C605C' }}
+        >
+          <img src={ceklisIcon} alt="" className="h-5 w-5 object-contain" />
+          {completing ? 'Saving...' : 'Mark as Done'}
+        </button>
 
         <div className="flex items-center gap-3">
           <div className="flex items-center pl-1">

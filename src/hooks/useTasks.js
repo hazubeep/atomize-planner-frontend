@@ -7,7 +7,6 @@ const useTasks = () => {
   const [error, setError]     = useState(null)
 
   const normalizeTask = (task) => {
-    // Support both API shapes: micro_steps and task_steps.
     if (task?.task_steps && !task.micro_steps) {
       return { ...task, micro_steps: task.task_steps }
     }

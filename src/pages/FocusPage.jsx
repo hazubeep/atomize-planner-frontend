@@ -105,27 +105,22 @@ const StepRow = ({ step, isCurrent, toggling, onStartFocus, onReAtomize, onMarkW
 
 const FocusPage = () => {
   const { tasks, setTasks, loading, error, fetchTasks } = useTasks()
-  const [activeTaskId, setActiveTaskId] = useState(null)
   const [reAtomizing, setReAtomizing] = useState(null)
   const [working, setWorking] = useState(null)
   const navigate = useNavigate()
 
   const focusId =
-    activeTaskId ??
     tasks.find((t) => t.task_steps?.some((s) => !s.is_completed))?.id ??
     tasks[0]?.id ??
     null
 
   const { task, markStepWorking, reAtomizeStep } = useTaskDetail(String(focusId), tasks, setTasks)
-
   // use task_steps (API v4) with fallback to micro_steps
   const steps = task?.task_steps ?? task?.micro_steps ?? []
   const progress = task?.progress_percentage ?? 0
   const done = task?.completed_steps ?? steps.filter((s) => s.is_completed).length
   const currentIdx = steps.findIndex((s) => !s.is_completed && s.status !== 'completed')
-  const complexStep = task?.complexity_alert
-    ? steps.find((s) => String(s.id) === String(task.complexity_alert.step_id)) ?? null
-    : null
+
 
   const handleStartFocus = async (taskId, stepId) => {
     if (!taskId || !stepId) return
@@ -156,24 +151,6 @@ const FocusPage = () => {
   return (
     <>
       <div className="animate-fade-in flex flex-col pb-8 pt-[22px]">
-        {tasks.length > 1 && (
-          <div className="-mx-1 mb-5 flex gap-2 overflow-x-auto pb-1">
-            {tasks.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => setActiveTaskId(t.id)}
-                className={cn(
-                  'flex-shrink-0 cursor-pointer whitespace-nowrap rounded-full border border-border px-3 py-1.5 text-[11px] font-medium',
-                  focusId === t.id ? 'bg-accent text-white' : 'bg-white text-text-secondary'
-                )}
-              >
-                {t.title.slice(0, 24)}{t.title.length > 24 ? '…' : ''}
-              </button>
-            ))}
-          </div>
-        )}
-
         {task ? (
           <>
             <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-text-muted">Current Objective</p>
@@ -197,34 +174,15 @@ const FocusPage = () => {
               ))}
             </div>
 
-            <div className="flex gap-3">
-              {/* AI Suggestion dari API */}
-              <div className="min-w-0 flex-1 rounded-2xl border border-border bg-white p-4">
-                <div className="mb-2 flex items-center gap-[7px]">
-                  <span className="text-lg">💡</span>
-                  <span className="text-xs font-bold text-text-primary">AI Suggestion</span>
-                </div>
-                <p className="text-[11px] leading-relaxed text-text-secondary">
-                  {task.ai_suggestion?.message ?? 'Keep going! You are making great progress.'}
-                </p>
+            {/* AI Suggestion */}
+            <div className="mx-auto w-full max-w-md rounded-2xl border border-border bg-white p-4 text-center">
+              <div className="mb-2 flex items-center justify-center gap-[7px]">
+                <span className="text-lg">💡</span>
+                <span className="text-xs font-bold text-text-primary">AI Suggestion</span>
               </div>
-
-              {/* Complexity Alert dari API */}
-              {complexStep && task.complexity_alert && (
-                <div className="min-w-0 flex-1 rounded-2xl border border-teal-border bg-teal-light p-4">
-                  <p className="mb-1.5 text-[10px] font-extrabold uppercase tracking-wide text-teal">Complexity Alert</p>
-                  <p className="mb-3 text-[11px] leading-relaxed text-text-secondary">
-                    {task.complexity_alert.message}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => handleReAtomize(task.complexity_alert.step_id)}
-                    className="inline-flex cursor-pointer items-center rounded-lg border-none bg-teal px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wide text-white"
-                  >
-                    Deconstruct Now
-                  </button>
-                </div>
-              )}
+              <p className="text-[11px] leading-relaxed text-text-secondary">
+                {task.ai_suggestion?.message ?? 'Keep going! You are making great progress.'}
+              </p>
             </div>
           </>
         ) : (
