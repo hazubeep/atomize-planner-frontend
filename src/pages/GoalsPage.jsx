@@ -2,76 +2,9 @@ import { useNavigate } from 'react-router-dom'
 import useTasks from '../hooks/useTasks'
 import Spinner from '../components/atoms/Spinner'
 import ErrorMessage from '../components/atoms/ErrorMessage'
-import circlePlus from '../assets/circle plus.svg'
 import calmWorkspace from '../assets/Calm workspace.png'
-
-const categoryLabel = (category) => category
-  ? category.charAt(0) + category.slice(1).toLowerCase().replace('_', ' ')
-  : 'General'
-
-const TaskCard = ({ task, onClick }) => {
-  const steps = task.task_steps ?? task.micro_steps ?? []
-  const progress = task.progress_percentage ?? 0
-  const done = task.completed_steps ?? steps.filter((s) => s.is_completed).length
-  const total = task.total_steps ?? steps.length
-
-  return (
-    <div
-      onClick={onClick}
-      className="flex cursor-pointer flex-col rounded-xl border border-border bg-white p-6 shadow-sm transition hover:shadow-md"
-    >
-      {/* Category badge */}
-      <span className="mb-4 inline-block w-fit rounded-lg bg-[#eff4fc] px-3 py-1 text-[11px] font-semibold text-[#565C63]">
-        {categoryLabel(task.category)}
-      </span>
-
-      {/* Title */}
-      <h3 className="mb-3 text-[17px] font-extrabold leading-snug text-text-primary">
-        {task.title}
-      </h3>
-
-      {/* Description */}
-      {task.description && (
-        <p className="mb-5 line-clamp-2 text-[13px] leading-relaxed text-text-secondary">
-          {task.description}
-        </p>
-      )}
-
-      {/* Progress */}
-      <div className="mt-auto">
-        <div className="mb-1.5 flex items-center justify-between">
-          <span className="text-[11px] font-medium text-text-muted">Overall Progress</span>
-          <span className="text-[11px] font-semibold text-text-primary">{progress}%</span>
-        </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-[#BFEBE4]">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-[#3C6660] to-[#BFEBE4] transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <p className="mt-1.5 text-[11px] text-text-muted">{done} of {total} steps done</p>
-      </div>
-
-      {/* Open */}
-      <div className="mt-5 flex justify-end">
-        <span className="text-[13px] font-bold text-[#3C6660]">Open &rsaquo;</span>
-      </div>
-    </div>
-  )
-}
-
-const EmptyCard = ({ onClick }) => (
-  <div
-    onClick={onClick}
-    className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#AFB3AE] bg-[#F4F4F0] p-10 transition hover:brightness-95"
-  >
-    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-[#E0E4DE]">
-      <img src={circlePlus} alt="add" className="h-8 w-8 object-contain" />
-    </div>
-    <p className="mb-1.5 text-sm font-bold text-text-primary">Dream something new</p>
-    <p className="text-center text-[12px] text-text-secondary">Define a major objective to atomize</p>
-  </div>
-)
+import TaskCard from '../components/Goals/TaskCard'
+import EmptyCard from '../components/Goals/EmptyCard'
 
 const GoalsPage = () => {
   const navigate = useNavigate()

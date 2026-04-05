@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Input from '../components/atoms/Input'
 import { getProfile, updateProfile, deleteAccount, uploadAvatar, changePassword } from '../services/profileService'
-import accountIcon from '../assets/account_icon.svg'
-import securityIcon from '../assets/security_icon.svg'
-import pensilIcon from '../assets/pensil.svg'
+import AvatarCard from '../components/Profile/AvatarCard'
+import AccountDetailsForm from '../components/Profile/AccountDetailsForm'
+import SecuritySettings from '../components/Profile/SecuritySettings'
+import DeleteAccountModal from '../components/Profile/DeleteAccountModal'
 
 const parseError = (err) => err?.error?.message || err?.message || 'Terjadi kesalahan.'
 
@@ -21,14 +21,9 @@ const ProfilePage = () => {
   const [email, setEmail] = useState('')
 
   const [currentPassword, setCurrentPassword] = useState('')
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [showNewPassword, setShowNewPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  const [deletePassword, setDeletePassword] = useState('')
-  const [showDeletePassword, setShowDeletePassword] = useState(false)
   const [deleteError, setDeleteError] = useState('')
 
   const [alert, setAlert] = useState('')
@@ -59,9 +54,7 @@ const ProfilePage = () => {
     else setAlert(msg)
   }
 
-  const handleUploadAvatar = async (event) => {
-    const file = event.target.files?.[0]
-    if (!file) return
+  const handleUploadAvatar = async (file) => {
     setSaving(true)
     try {
       const formData = new FormData()
@@ -116,15 +109,15 @@ const ProfilePage = () => {
     }
   }
 
-  const handleDeleteAccount = async () => {
-    if (!deletePassword) {
+  const handleDeleteAccount = async (password) => {
+    if (!password) {
       setDeleteError('Masukkan password untuk menghapus akun.')
       return
     }
     setDeleting(true)
     setDeleteError('')
     try {
-      await deleteAccount({ current_password: deletePassword })
+      await deleteAccount({ current_password: password })
       localStorage.removeItem('token')
       navigate('/register')
     } catch (err) {
@@ -136,9 +129,7 @@ const ProfilePage = () => {
 
   const closeDeleteModal = () => {
     setDeleteModalOpen(false)
-    setDeletePassword('')
     setDeleteError('')
-    setShowDeletePassword(false)
   }
 
   if (loading) {
@@ -158,72 +149,24 @@ const ProfilePage = () => {
 
       <div className="mt-8 grid gap-12 lg:grid-cols-[340px_1fr]">
         {/* Avatar Card */}
-        <div className="h-fit rounded-[18px] bg-[#F4F4F0] p-5">
-          <div className="relative mx-auto mb-4 h-28 w-28">
-            <img src={profile.avatar_url || '/src/assets/avatar.png'} alt="Avatar" className="h-full w-full rounded-full object-cover" />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="absolute bottom-0 right-0 flex h-6 w-6 items-center justify-center rounded-full border border-white bg-white shadow-sm"
-              aria-label="Edit avatar"
-            >
-              <img src={pensilIcon} alt="edit" className="h-3 w-3" />
-            </button>
-            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleUploadAvatar} className="hidden" />
-          </div>
-          <h2 className="text-center text-xl font-semibold text-text-primary">{profile.name || 'User'}</h2>
-          <p className="mt-1 text-center text-sm text-text-muted">{profile.email}</p>
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={saving}
-            className="mt-4 w-full rounded-lg bg-[#E0E4DE] px-4 py-2 text-sm font-semibold text-text-primary transition hover:brightness-95 disabled:opacity-60"
-          >
-            Change Photo
-          </button>
-        </div>
+        <AvatarCard profile={profile} onUpload={handleUploadAvatar} saving={saving} />
 
         <div className="space-y-6">
-          {/* Account Details */}
-          <div className="rounded-[18px] bg-[#F4F4F0] p-5">
-            <div className="mb-5 flex items-center gap-2">
-              <img src={accountIcon} alt="account" className="h-5 w-5" />
-              <h3 className="text-lg font-semibold">Account Details</h3>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Input label="Full name" value={fullName} onChange={(e) => setFullName(e.target.value)} className="bg-white border border-[#E0E4DE]" />
-              <Input label="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-white border border-[#E0E4DE]" />
-            </div>
-          </div>
+          <AccountDetailsForm
+            fullName={fullName}
+            setFullName={setFullName}
+            email={email}
+            setEmail={setEmail}
+          />
 
-          {/* Security — Change Password */}
-          <div className="rounded-[18px] bg-[#F4F4F0] p-5">
-            <div className="mb-5 flex items-center gap-2">
-              <img src={securityIcon} alt="security" className="h-5 w-5" />
-              <h3 className="text-lg font-semibold">Security</h3>
-            </div>
-            <p className="mb-4 text-xs text-text-muted">Leave password fields empty if you don't want to change it.</p>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="relative sm:col-span-2">
-                <Input label="Current Password" type={showCurrentPassword ? 'text' : 'password'} value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="bg-white border border-[#E0E4DE] pr-10" />
-                <button type="button" onClick={() => setShowCurrentPassword((v) => !v)} className="absolute right-3 top-[38px] text-sm text-text-muted">
-                  {showCurrentPassword ? '🙈' : '👁'}
-                </button>
-              </div>
-              <div className="relative">
-                <Input label="New Password" type={showNewPassword ? 'text' : 'password'} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="bg-white border border-[#E0E4DE] pr-10" />
-                <button type="button" onClick={() => setShowNewPassword((v) => !v)} className="absolute right-3 top-[38px] text-sm text-text-muted">
-                  {showNewPassword ? '🙈' : '👁'}
-                </button>
-              </div>
-              <div className="relative">
-                <Input label="Confirm New Password" type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="bg-white border border-[#E0E4DE] pr-10" />
-                <button type="button" onClick={() => setShowConfirmPassword((v) => !v)} className="absolute right-3 top-[38px] text-sm text-text-muted">
-                  {showConfirmPassword ? '🙈' : '👁'}
-                </button>
-              </div>
-            </div>
-          </div>
+          <SecuritySettings
+            currentPassword={currentPassword}
+            setCurrentPassword={setCurrentPassword}
+            newPassword={newPassword}
+            setNewPassword={setNewPassword}
+            confirmPassword={confirmPassword}
+            setConfirmPassword={setConfirmPassword}
+          />
 
           {/* Actions */}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -246,52 +189,13 @@ const ProfilePage = () => {
         </div>
       </div>
 
-      {/* Delete Account Modal */}
-      {deleteModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
-            <h2 className="mb-1 text-lg font-semibold text-gray-900">Delete Account</h2>
-            <p className="mb-5 text-sm text-gray-500">
-              This action is <span className="font-semibold text-red-600">irreversible</span>. Enter your password to confirm.
-            </p>
-
-            {deleteError && (
-              <p className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{deleteError}</p>
-            )}
-
-            <div className="relative mb-5">
-              <Input
-                label="Password"
-                type={showDeletePassword ? 'text' : 'password'}
-                value={deletePassword}
-                onChange={(e) => setDeletePassword(e.target.value)}
-                className="border border-gray-200 pr-10"
-              />
-              <button type="button" onClick={() => setShowDeletePassword((v) => !v)} className="absolute right-3 top-[38px] text-sm text-text-muted">
-                {showDeletePassword ? '🙈' : '👁'}
-              </button>
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={closeDeleteModal}
-                className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleDeleteAccount}
-                disabled={deleting}
-                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:opacity-60"
-              >
-                {deleting ? 'Deleting...' : 'Delete Account'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteAccountModal
+        isOpen={deleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleDeleteAccount}
+        deleting={deleting}
+        error={deleteError}
+      />
     </div>
   )
 }

@@ -116,6 +116,31 @@ export const mockAddTaskStep = async (taskId, payload) => {
   return { success: true, data: step };
 };
 
+export const mockUpdateTaskStep = async (taskId, stepId, payload) => {
+  await delay();
+  const task = tasks.find((t) => String(t.id) === String(taskId));
+  if (!task) {
+    const error = new Error('Task not found');
+    error.response = { status: 404, data: { message: 'Task not found' } };
+    throw error;
+  }
+
+  let updatedStep = null;
+  task.task_steps = task.task_steps.map((step) => {
+    if (String(step.id) !== String(stepId)) return step;
+    updatedStep = { ...step, ...payload, updated_at: new Date().toISOString() };
+    return updatedStep;
+  });
+
+  if (!updatedStep) {
+     throw { response: { status: 404, data: { message: 'Step not found' } } };
+  }
+
+  task.updated_at = new Date().toISOString();
+
+  return { success: true, data: updatedStep };
+};
+
 export const mockToggleTaskStep = async (taskId, stepId, is_completed) => {
   await delay();
   const task = tasks.find((t) => String(t.id) === String(taskId));

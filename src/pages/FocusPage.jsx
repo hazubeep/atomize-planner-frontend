@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import { cn } from '../utils'
 import useTasks from '../hooks/useTasks'
@@ -27,8 +27,68 @@ const CircleEmpty = ({ isCurrent }) => (
   />
 )
 
-const StepRow = ({ step, isCurrent, toggling, onStartFocus, onReAtomize, onMarkWorking }) => {
+const StepRow = ({ step, isCurrent, toggling, onStartFocus, onEdit, onMarkWorking }) => {
+  const [isEditing, setIsEditing] = useState(false)
+  const [editTitle, setEditTitle] = useState(step.title)
+  const [editDesc, setEditDesc] = useState(step.description || '')
+  
   const done = step.is_completed
+
+  const handleSave = async (e) => {
+    e.stopPropagation()
+    if (onEdit) {
+      await onEdit(step.id, { title: editTitle, description: editDesc })
+    }
+    setIsEditing(false)
+  }
+
+  const handleCancel = (e) => {
+    e.stopPropagation()
+    setEditTitle(step.title)
+    setEditDesc(step.description || '')
+    setIsEditing(false)
+  }
+
+  if (isEditing) {
+    return (
+      <div className={cn(
+        'mb-1.5 rounded-[14px] border border-border bg-white p-3.5 shadow-[0_2px_12px_rgba(0,0,0,0.07)]',
+        toggling && 'opacity-50 pointer-events-none'
+      )}>
+        <div className="flex flex-col gap-2">
+          <input
+            type="text"
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            className="w-full rounded border border-border bg-white p-2 text-sm text-text-primary outline-none focus:border-[#3C6660]"
+            placeholder="Step title"
+          />
+          <textarea
+            value={editDesc}
+            onChange={(e) => setEditDesc(e.target.value)}
+            className="w-full resize-none rounded border border-border bg-white p-2 text-xs text-text-secondary outline-none focus:border-[#3C6660]"
+            placeholder="Description (optional)"
+            rows={2}
+          />
+          <div className="mt-1 flex justify-end gap-2">
+            <button
+              onClick={handleCancel}
+              className="cursor-pointer rounded bg-transparent px-3 py-1.5 text-xs font-medium text-text-secondary border border-border"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              className="cursor-pointer rounded bg-[#3C6660] px-3 py-1.5 text-xs font-medium text-white transition hover:brightness-90"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div
       role={isCurrent ? 'button' : undefined}
@@ -43,7 +103,7 @@ const StepRow = ({ step, isCurrent, toggling, onStartFocus, onReAtomize, onMarkW
         'transition-opacity duration-200',
         isCurrent ? 'mb-1.5 rounded-[14px] border border-border bg-white p-3.5 shadow-[0_2px_12px_rgba(0,0,0,0.07)]' : 'border-b border-border py-3',
         !isCurrent && 'rounded-none border-x-0 border-t-0',
-        toggling && 'opacity-50',
+        toggling && 'opacity-50 pointer-events-none',
         isCurrent && 'cursor-pointer'
       )}
     >
@@ -86,14 +146,11 @@ const StepRow = ({ step, isCurrent, toggling, onStartFocus, onReAtomize, onMarkW
               </button>
               <button
                 type="button"
-                onClick={(e) => { e.stopPropagation(); onReAtomize?.(step.id) }}
+                onClick={(e) => { e.stopPropagation(); setIsEditing(true) }}
                 className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-transparent px-3 py-1.5 text-xs font-medium text-text-secondary"
               >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M1 4v6h6M23 20v-6h-6" strokeLinecap="round" />
-                  <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15" strokeLinecap="round" />
-                </svg>
-                ↺ Re-Atomize
+                <img src={icon_pensil} alt="edit" width="12" height="12" />
+                Edit
               </button>
             </div>
           )}
@@ -104,21 +161,26 @@ const StepRow = ({ step, isCurrent, toggling, onStartFocus, onReAtomize, onMarkW
 }
 
 const FocusPage = () => {
+  const location = useLocation()
   const { tasks, setTasks, loading, error, fetchTasks } = useTasks()
-  const [reAtomizing, setReAtomizing] = useState(null)
+  const [editingStep, setEditingStep] = useState(null)
   const [working, setWorking] = useState(null)
   const navigate = useNavigate()
 
+  const urlTaskId = location.state?.taskId
+
   const focusId =
+    urlTaskId ??
     tasks.find((t) => t.task_steps?.some((s) => !s.is_completed))?.id ??
     tasks[0]?.id ??
     null
 
-  const { task, markStepWorking, reAtomizeStep } = useTaskDetail(String(focusId), tasks, setTasks)
+  const { task, markStepWorking, editStep } = useTaskDetail(String(focusId), tasks, setTasks)
   // use task_steps (API v4) with fallback to micro_steps
   const steps = task?.task_steps ?? task?.micro_steps ?? []
-  const progress = task?.progress_percentage ?? 0
-  const done = task?.completed_steps ?? steps.filter((s) => s.is_completed).length
+  const total = steps.length
+  const done = steps.filter((s) => s.is_completed).length
+  const progress = total > 0 ? Math.round((done / total) * 100) : 0
   const currentIdx = steps.findIndex((s) => !s.is_completed && s.status !== 'completed')
 
 
@@ -138,9 +200,9 @@ const FocusPage = () => {
     try { await markStepWorking(stepId) } finally { setWorking(null) }
   }
 
-  const handleReAtomize = async (stepId) => {
-    setReAtomizing(stepId)
-    try { await reAtomizeStep(stepId) } finally { setReAtomizing(null) }
+  const handleEdit = async (stepId, payload) => {
+    setEditingStep(stepId)
+    try { await editStep(stepId, payload) } finally { setEditingStep(null) }
   }
 
   if (loading)
@@ -158,7 +220,7 @@ const FocusPage = () => {
               {task.title}
             </h1>
 
-            <ProgressSection progress={progress} done={done} total={task?.total_steps ?? steps.length} />
+            <ProgressSection progress={progress} done={done} total={total} />
 
             <div className="mb-7 flex flex-col">
               {steps.map((step, i) => (
@@ -166,9 +228,9 @@ const FocusPage = () => {
                   key={step.id}
                   step={step}
                   isCurrent={i === currentIdx}
-                  toggling={reAtomizing === step.id || working === step.id}
+                  toggling={editingStep === step.id || working === step.id}
                   onStartFocus={() => handleStartFocus(focusId, step.id)}
-                  onReAtomize={() => handleReAtomize(step.id)}
+                  onEdit={(stepId, payload) => handleEdit(stepId, payload)}
                   onMarkWorking={() => handleMarkWorking(step.id)}
                 />
               ))}

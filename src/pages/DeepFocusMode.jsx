@@ -16,6 +16,8 @@ import ceklisIcon from '../assets/ceklis.svg'
 import personIcon from '../assets/person.svg'
 import kotakFrame from '../assets/kotak_abu_abu.svg'
 import pengaturanIcon from '../assets/pengaturan_icon.svg'
+import TimerRing from '../components/DeepFocus/TimerRing'
+import SettingsModal from '../components/DeepFocus/SettingsModal'
 
 const LS_WORK = 'deepFocus_workSec'
 const LS_BREAK = 'deepFocus_breakSec'
@@ -56,30 +58,6 @@ function formatMmSs(sec) {
   return `${m}:${r.toString().padStart(2, '0')}`
 }
 
-const RING_R = 86
-const RING_C = 2 * Math.PI * RING_R
-
-function TimerRing({ phase, progress, gradientId = 'deepFocusRingGrad' }) {
-  const isBreak = phase === 'break'
-  const dashOffset = RING_C * (1 - progress)
-  const stroke = isBreak ? '#EAB308' : `url(#${gradientId})`
-  return (
-    <svg width="220" height="220" viewBox="0 0 200 200" className="-rotate-90" aria-hidden>
-      <defs>
-        <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#1a6b5a" />
-          <stop offset="100%" stopColor="#00c4a7" />
-        </linearGradient>
-      </defs>
-      <circle cx="100" cy="100" r={RING_R} fill="none" stroke="rgba(120,120,120,0.25)" strokeWidth="10" />
-      <circle
-        cx="100" cy="100" r={RING_R} fill="none" stroke={stroke} strokeWidth="10"
-        strokeLinecap="round" strokeDasharray={RING_C} strokeDashoffset={dashOffset}
-        className="transition-[stroke-dashoffset] duration-300 ease-linear"
-      />
-    </svg>
-  )
-}
 
 function timerReducer(state, action) {
   switch (action.type) {
@@ -200,7 +178,7 @@ const DeepFocusPage = () => {
         await toggleStep(stepId, false)
       }
       setCurrentSession(null)
-      navigate('/focus')
+      navigate('/focus', { state: { taskId } })
     } catch (err) {
       const msg = err?.error?.message || err?.message || 'Failed to complete focus session'
       setSessionError(msg)
@@ -245,7 +223,7 @@ const DeepFocusPage = () => {
       <header className="sticky top-0 z-30 flex w-full shrink-0 items-center justify-between border-b border-black/5 bg-[#F8F9F8]/95 py-2.5 pl-3 pr-3 backdrop-blur-sm sm:pl-4 sm:pr-4">
         <button
           type="button"
-          onClick={() => navigate('/focus')}
+          onClick={() => navigate('/focus', { state: { taskId } })}
           className="flex shrink-0 items-center gap-1.5 rounded-full border-none bg-transparent py-1 text-left text-xs font-medium text-[#2F3430] hover:opacity-80"
         >
           <img src={tandaPanah} alt="" className="h-5 w-5 shrink-0 object-contain" />
@@ -419,28 +397,15 @@ const DeepFocusPage = () => {
         </div>
       </footer>
 
-      {settingsOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby="deep-focus-settings-title">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-            <h2 id="deep-focus-settings-title" className="mb-1 text-lg font-semibold text-gray-900">Timer settings</h2>
-            <p className="mb-5 text-sm text-gray-500">Adjust focus and break duration.</p>
-            <div className="space-y-4">
-              <label className="block">
-                <span className="mb-1 block text-xs font-medium text-gray-700">Focus (minutes)</span>
-                <input type="number" min={1} max={180} value={draftWorkMin} onChange={(e) => setDraftWorkMin(Number(e.target.value))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm" />
-              </label>
-              <label className="block">
-                <span className="mb-1 block text-xs font-medium text-gray-700">Break (minutes)</span>
-                <input type="number" min={1} max={60} value={draftBreakMin} onChange={(e) => setDraftBreakMin(Number(e.target.value))} className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm" />
-              </label>
-            </div>
-            <div className="mt-6 flex justify-end gap-2">
-              <button type="button" onClick={() => setSettingsOpen(false)} className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
-              <button type="button" onClick={applySettings} className="rounded-xl bg-[#305954] px-4 py-2 text-sm font-medium text-white hover:bg-[#264643]">Save</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <SettingsModal
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        onSave={applySettings}
+        draftWorkMin={draftWorkMin}
+        setDraftWorkMin={setDraftWorkMin}
+        draftBreakMin={draftBreakMin}
+        setDraftBreakMin={setDraftBreakMin}
+      />
     </div>
   )
 }

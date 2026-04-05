@@ -9,6 +9,7 @@ import {
   mockToggleTaskStep,
   mockMarkStepWorking,
   mockReAtomizeStep,
+  mockUpdateTaskStep,
 } from '../mock/mockService';
 
 const USE_MOCK = true;
@@ -61,6 +62,13 @@ export const addTaskStep = async (taskId, payload) => {
 export const toggleTaskStep = async (taskId, stepId, is_completed) => {
   if (USE_MOCK) return mockToggleTaskStep(taskId, stepId, is_completed);
   const res = await api.patch(`/tasks/${taskId}/steps/${stepId}/toggle`, is_completed !== undefined ? { is_completed } : {});
+  return res.data; // { success, data: TaskStep }
+};
+
+// PATCH /tasks/:taskId/steps/:stepId
+export const updateTaskStep = async (taskId, stepId, payload) => {
+  if (USE_MOCK) return mockUpdateTaskStep(taskId, stepId, payload);
+  const res = await api.patch(`/tasks/${taskId}/steps/${stepId}`, payload);
   return res.data; // { success, data: TaskStep }
 };
 
