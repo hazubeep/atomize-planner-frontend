@@ -10,6 +10,7 @@ import {
   mockMarkStepWorking,
   mockReAtomizeStep,
   mockUpdateTaskStep,
+  mockDeleteTaskStep,
 } from '../mock/mockService';
 
 const USE_MOCK = true;
@@ -70,6 +71,13 @@ export const updateTaskStep = async (taskId, stepId, payload) => {
   if (USE_MOCK) return mockUpdateTaskStep(taskId, stepId, payload);
   const res = await api.patch(`/tasks/${taskId}/steps/${stepId}`, payload);
   return res.data; // { success, data: TaskStep }
+};
+
+// DELETE /tasks/:taskId/steps/:stepId
+export const deleteTaskStep = async (taskId, stepId) => {
+  if (USE_MOCK) return mockDeleteTaskStep(taskId, stepId);
+  const res = await api.delete(`/tasks/${taskId}/steps/${stepId}`);
+  return res.data; // { success, message }
 };
 
 // POST /tasks/:taskId/steps/:stepId/mark-working
