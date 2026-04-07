@@ -9,7 +9,6 @@ const LoginPage = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const togglePassword = () => setShowPassword(!showPassword);
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.type === 'email' ? 'email' : 'password']: e.target.value });
   };
@@ -72,7 +71,6 @@ const LoginPage = () => {
                   Forgot Password?
                 </Link>
               </div>
-
               <div className="relative">
                 <input 
                   type={showPassword ? "text" : "password"} 
@@ -83,8 +81,8 @@ const LoginPage = () => {
                   required
                 />
                 <button
-                  type="button" 
-                  onClick={togglePassword}
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#3C6660]"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -108,26 +106,17 @@ const LoginPage = () => {
             {/* Divider */}
             <div className="relative my-4 flex items-center">
               <div className="grow border-t border-gray-200"></div>
-              <span className="mx-4 shrink text-[10px] text-gray-400 uppercase tracking-widest font-bold">
-                Or continue with
-              </span>
+              <span className="mx-4 shrink text-[10px] text-gray-400 uppercase tracking-widest font-bold">Or continue with</span>
               <div className="grow border-t border-gray-200"></div>
             </div>
 
             {/* Social Buttons */}
             <div className="flex gap-4">
-              <button
-                type="button"
-                className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-              >
+              <button type="button" className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
                 <img src="images/google.svg" loading="lazy" alt="google" className="h-5 w-5" />
                 <span>Google</span>
               </button>
-
-              <button
-                type="button"
-                className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-              >
+              <button type="button" className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
                 <img src="images/apple.svg" loading="lazy" alt="apple" className="h-5 w-5" />
                 <span>Apple</span>
               </button>

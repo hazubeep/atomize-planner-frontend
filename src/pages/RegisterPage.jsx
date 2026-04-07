@@ -39,18 +39,12 @@ const RegisterPage = () => {
   return (
     <main className="flex h-screen w-full overflow-hidden bg-[#FAF9F6]">
       
-      {/* SISI KIRI: BRANDING & SOCIAL PROOF (Warna Hijau Muda ke Biru) */}
+      {/* SISI KIRI */}
       <div className="hidden w-1/2 flex-col justify-center bg-[#BFEBE4] p-16 lg:flex">
-        <div className="flex flex-col items-start gap-8"> 
-          
-          {/* 1. Logo Badge */}
+        <div className="flex flex-col items-start gap-8">
           <div className="flex items-center text-xs font-bold tracking-widest uppercase">
-            <span className="rounded-full bg-[#1C4641] px-6 py-2 text-[#BFEBE4] shadow-sm">
-              AtomizePlanner
-            </span>
+            <span className="rounded-full bg-[#1C4641] px-6 py-2 text-[#BFEBE4] shadow-sm">AtomizePlanner</span>
           </div>
-
-          {/* 2. Headline Group */}
           <div className="max-w-xl text-left">
             <h1 className="mb-4 text-6xl font-extrabold leading-[1.1] text-[#1C4641] tracking-tight">
               Start your journey to calm productivity
@@ -59,27 +53,18 @@ const RegisterPage = () => {
               Replace the noise of standard productivity tools with a mindful sanctuary designed for deep work.
             </p>
           </div>
-
-          {/* 3. Social Proof Group */}
           <div className="mt-4 flex items-center gap-4">
             <div className="flex -space-x-3">
               {[1, 2, 3].map((i) => (
-                <img
-                  key={i}
-                  className="h-12 w-12 rounded-full border-2 border-[#BFEBE4] bg-gray-200 shadow-sm"
-                  src={`https://i.pravatar.cc/150?u=reg-${i}`}
-                  alt="user avatar"
-                />
+                <img key={i} className="h-12 w-12 rounded-full border-2 border-[#BFEBE4] bg-gray-200 shadow-sm" src={`https://i.pravatar.cc/150?u=reg-${i}`} alt="user avatar" />
               ))}
             </div>
-            <p className="text-sm font-semibold text-[#1C4641]">
-              Joined by 12,000+ mindful creators
-            </p>
+            <p className="text-sm font-semibold text-[#1C4641]">Joined by 12,000+ mindful creators</p>
           </div>
         </div>
       </div>
 
-      {/* SISI KANAN: FORM REGISTER (Warna Putih) */}
+      {/* SISI KANAN */}
       <div className="flex w-full items-center justify-center bg-white p-8 md:p-12 lg:w-1/2 lg:bg-[#FAF9F6]">
         <div className="w-full max-w-lg rounded-3xl bg-white p-8 md:p-12 shadow-xl lg:shadow-none">
           
@@ -115,7 +100,7 @@ const RegisterPage = () => {
               </div>
             </div>
 
-            {/* Input Email */}
+            {/* Email */}
             <div className="mb-4 text-left">
               <label className="mb-1.5 block text-sm font-semibold text-[#5C605C]">Email Address</label>
               <div className="relative">
@@ -134,8 +119,8 @@ const RegisterPage = () => {
               </div>
             </div>
 
-            {/* Input Password */}
-            <div className="mb-2 text-left">
+            {/* Password */}
+            <div className="mb-4 text-left">
               <label className="mb-1.5 block text-sm font-semibold text-[#5C605C]">Password</label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
@@ -163,25 +148,11 @@ const RegisterPage = () => {
               </p>
             </div>
 
-            {/* Checkbox Bulat (Terms & Policy) */}
+            {/* Terms */}
             <div className="mb-8 mt-4 flex items-start gap-3 px-1 text-left">
               <div className="relative flex items-center shrink-0">
-                <input
-                  id="terms"
-                  type="checkbox"
-                  required
-                  className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-gray-300 transition-all checked:bg-[#3C6660] checked:border-[#3C6660] focus:outline-none"
-                />
-                <svg
-                  className="absolute h-3.5 w-3.5 pointer-events-none hidden peer-checked:block left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                <input id="terms" type="checkbox" required className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-gray-300 transition-all checked:bg-[#3C6660] checked:border-[#3C6660] focus:outline-none" />
+                <svg className="absolute h-3.5 w-3.5 pointer-events-none hidden peer-checked:block left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
               </div>
@@ -205,14 +176,11 @@ const RegisterPage = () => {
 
             <p className="text-center text-sm text-[#5C605C]">
               Already have an account?{' '}
-              <Link to="/login" className="font-semibold text-[#3C6660] hover:underline">
-                Sign In
-              </Link>
+              <Link to="/login" className="font-semibold text-[#3C6660] hover:underline">Sign In</Link>
             </p>
           </form>
         </div>
       </div>
-
     </main>
   );
 };

@@ -6,13 +6,24 @@ const useTasks = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState(null)
 
+  const normalizeTask = (task) => {
+    if (task?.task_steps && !task.micro_steps) {
+      return { ...task, micro_steps: task.task_steps }
+    }
+    if (task?.micro_steps && !task.task_steps) {
+      return { ...task, task_steps: task.micro_steps }
+    }
+    return task
+  }
+
   const fetchTasks = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
       const data = await getTasks()
       // Normalise: API may return { data: [...] } or directly [...]
-      setTasks(Array.isArray(data) ? data : data?.data ?? [])
+      const list = Array.isArray(data) ? data : data?.data ?? []
+      setTasks(list.map((t) => normalizeTask(t)))
     } catch (err) {
       setError(err.message)
     } finally {

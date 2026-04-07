@@ -1,12 +1,12 @@
-import { toggleTaskStep } from './taskService'
-import { mockToggleMicroStep } from '../mock/mockService'
+import api from './api';
+import { mockToggleTaskStep } from '../mock/mockService';
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
 
-// Legacy helper to keep existing hook/signature compatible while migrating to new API contract.
+// PATCH /tasks/:taskId/steps/:stepId/toggle
+// signature (taskId, stepId, is_completed) 
 export const toggleMicroStep = async (taskId, stepId, is_completed) => {
-  if (USE_MOCK) return mockToggleMicroStep(stepId, is_completed)
-  if (!taskId) throw new Error('taskId is required to toggle a step in the new API')
-  return toggleTaskStep(taskId, stepId, is_completed)
-}
-
+  if (USE_MOCK) return mockToggleTaskStep(taskId, stepId, is_completed);
+  const res = await api.patch(`/tasks/${taskId}/steps/${stepId}/toggle`, is_completed !== undefined ? { is_completed } : {});
+  return res.data; // { success, data: TaskStep }
+};

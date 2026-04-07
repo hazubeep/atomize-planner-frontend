@@ -48,7 +48,7 @@ const StepItem = ({ step, taskId, onMarkWorking, onReatomize, index }) => {
 
   const handleReatomize = async () => {
     setLoadingReatomize(true)
-    try { await onReatomize?.(taskId) } finally { setLoadingReatomize(false) }
+    try { await onReatomize?.(stepId) } finally { setLoadingReatomize(false) }
   }
 
   return (
@@ -86,8 +86,8 @@ const StepItem = ({ step, taskId, onMarkWorking, onReatomize, index }) => {
             {step.title ?? step.description ?? step.name}
           </p>
 
-          {/* Description shown only for current step */}
-          {isCurrent && step.description && step.description !== step.title && (
+          {/* Always show description when available */}
+          {step.description && step.description !== step.title && (
             <p className="mt-1 text-xs leading-relaxed text-text-muted">
               {step.description}
             </p>

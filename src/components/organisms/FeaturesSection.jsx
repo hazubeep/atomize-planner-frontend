@@ -24,21 +24,21 @@ const features = [
 
 const FeaturesSection = () => (
   <div id="features" className="bg-bg">
-    <Section className="py-[clamp(96px,8.5vw,150px)]">
-      <div className="grid items-center gap-[clamp(44px,6vw,96px)] grid-cols-[0.9fr_1.1fr]">
-        <div>
-          <h2 className="mb-[clamp(28px,3.2vw,60px)] font-display text-[clamp(36px,3.6vw,64px)] font-normal leading-[1.02] text-text-primary">
+    <Section className="py-10">
+      <div className="flex flex-col gap-8 md:grid md:items-center md:grid-cols-[0.9fr_1.1fr] md:gap-[clamp(30px,4vw,60px)]">
+        <div className="w-full">
+          <h2 className="mb-6 font-display text-[clamp(32px,3.6vw,64px)] font-normal leading-[1.05] text-text-primary md:mb-[clamp(28px,3.2vw,60px)]">
             Core Sanctuary Features
           </h2>
-          <div className="flex flex-col gap-[clamp(16px,1.8vw,26px)]">
+          <div className="flex flex-col gap-5 md:gap-[clamp(16px,1.8vw,26px)]">
             {features.map((f) => (
-              <div key={f.title} className="flex items-start gap-4.5">
-                <div className="flex h-[clamp(38px,2.4vw,52px)] w-[clamp(38px,2.4vw,52px)] shrink-0 items-center justify-center rounded-[14px] border border-[rgba(6,78,59,0.14)] bg-accent-light">
-                  <img src={f.icon} alt="" className="h-[clamp(18px,1.35vw,26px)] w-[clamp(18px,1.35vw,26px)] object-contain" />
+              <div key={f.title} className="flex items-start gap-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] border border-[rgba(6,78,59,0.14)] bg-accent-light md:h-[clamp(38px,2.4vw,52px)] md:w-[clamp(38px,2.4vw,52px)]">
+                  <img src={f.icon} alt="" className="h-5 w-5 object-contain md:h-[clamp(18px,1.35vw,26px)] md:w-[clamp(18px,1.35vw,26px)]" />
                 </div>
-                <div>
-                  <p className="mb-2 text-[clamp(16px,1.45vw,22px)] font-bold text-text-primary">{f.title}</p>
-                  <p className="max-w-[clamp(320px,30vw,520px)] text-[clamp(13px,1.05vw,16px)] leading-[1.7] text-text-secondary">
+                <div className="flex-1">
+                  <p className="mb-1.5 text-[clamp(16px,1.45vw,22px)] font-bold text-text-primary">{f.title}</p>
+                  <p className="text-[clamp(13px,1.05vw,16px)] leading-[1.7] text-text-secondary">
                     {f.desc}
                   </p>
                 </div>
@@ -47,7 +47,7 @@ const FeaturesSection = () => (
           </div>
         </div>
 
-        <div className="relative flex justify-end">
+        <div className="relative hidden md:flex md:justify-end">
           <img
             src={laptopImg}
             alt="workspace"

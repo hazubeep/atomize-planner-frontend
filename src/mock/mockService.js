@@ -116,6 +116,59 @@ export const mockAddTaskStep = async (taskId, payload) => {
   return { success: true, data: step };
 };
 
+export const mockUpdateTaskStep = async (taskId, stepId, payload) => {
+  await delay();
+  const task = tasks.find((t) => String(t.id) === String(taskId));
+  if (!task) {
+    const error = new Error('Task not found');
+    error.response = { status: 404, data: { message: 'Task not found' } };
+    throw error;
+  }
+
+  let updatedStep = null;
+  task.task_steps = task.task_steps.map((step) => {
+    if (String(step.id) !== String(stepId)) return step;
+    updatedStep = { ...step, ...payload, updated_at: new Date().toISOString() };
+    return updatedStep;
+  });
+
+  if (!updatedStep) {
+     throw { response: { status: 404, data: { message: 'Step not found' } } };
+  }
+
+  task.updated_at = new Date().toISOString();
+
+  return { success: true, data: updatedStep };
+};
+
+export const mockDeleteTaskStep = async (taskId, stepId) => {
+  await delay();
+  const task = tasks.find((t) => String(t.id) === String(taskId));
+  if (!task) {
+    const error = new Error('Task not found');
+    error.response = { status: 404, data: { message: 'Task not found' } };
+    throw error;
+  }
+
+  const initialLength = task.task_steps.length;
+  task.task_steps = task.task_steps.filter(step => String(step.id) !== String(stepId));
+
+  if (task.task_steps.length === initialLength) {
+    const error = new Error('Step not found');
+    error.response = { status: 404, data: { message: 'Step not found' } };
+    throw error;
+  }
+
+  task.total_steps = task.task_steps.length;
+  task.completed_steps = task.task_steps.filter((s) => s.is_completed).length;
+  task.progress_percentage = task.total_steps
+    ? Math.round((task.completed_steps / task.total_steps) * 100)
+    : 0;
+  task.updated_at = new Date().toISOString();
+
+  return { success: true, message: "Step deleted successfully." };
+};
+
 export const mockToggleTaskStep = async (taskId, stepId, is_completed) => {
   await delay();
   const task = tasks.find((t) => String(t.id) === String(taskId));

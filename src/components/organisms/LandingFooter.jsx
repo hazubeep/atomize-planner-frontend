@@ -4,14 +4,14 @@ const linkClass =
 const LandingFooter = () => {
   return (
     <footer className="border-t border-border bg-bg">
-      <div className="w-full px-6 py-7 lg:px-16">
-        <div className="flex flex-wrap items-start justify-between gap-[18px]">
-          <div className="flex flex-col gap-1.5">
+      <div className="w-full px-6 py-5 lg:px-16">
+        <div className="flex flex-col items-center gap-4 md:flex-row md:items-start md:justify-between md:gap-[18px]">
+          <div className="flex flex-col gap-1.5 text-center md:text-left">
             <span className="font-display text-base text-text-primary">AtomizePlanner</span>
             <span className="text-xs text-text-muted">© 2024 AtomizePlanner. Designed for deep focus.</span>
           </div>
 
-          <div className="flex flex-wrap items-center justify-end gap-[18px]">
+          <div className="flex flex-row items-center justify-center gap-2 md:flex-row md:items-center md:justify-end md:gap-[18px]">
             <a className={linkClass} href="#privacy">
               Privacy Policy
             </a>
