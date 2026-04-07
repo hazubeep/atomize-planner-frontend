@@ -1,9 +1,40 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, User, Mail, Lock, Star } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Eye, EyeOff, User, Mail, Lock, Loader2 } from 'lucide-react'; 
+import { Link, useNavigate } from 'react-router-dom';
+import { register } from '../services/authService'; 
 
 const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const response = await register(formData);
+      console.log('Registrasi Berhasil:', response);
+      navigate('/home'); 
+    } catch (err) {
+      setError(err.message || 'Gagal membuat akun. Silakan coba lagi.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <main className="flex h-screen w-full overflow-hidden bg-[#FAF9F6]">
@@ -52,13 +83,19 @@ const RegisterPage = () => {
       <div className="flex w-full items-center justify-center bg-white p-8 md:p-12 lg:w-1/2 lg:bg-[#FAF9F6]">
         <div className="w-full max-w-lg rounded-3xl bg-white p-8 md:p-12 shadow-xl lg:shadow-none">
           
-          {/* Header Form */}
           <div className="mb-8">
             <h2 className="mb-2 text-4xl font-bold text-gray-900">Get Started</h2>
             <p className="text-lg text-[#5C605C]">Create an account to continue.</p>
           </div>
 
-          <form className="flex w-full flex-col">
+          {/* Tampilkan Error */}
+          {error && (
+            <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-500 border border-red-100">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="flex w-full flex-col">
             {/* Input Name */}
             <div className="mb-4 text-left">
               <label className="mb-1.5 block text-sm font-semibold text-[#5C605C]">Full Name</label>
@@ -68,6 +105,9 @@ const RegisterPage = () => {
                 </div>
                 <input 
                   type="text"
+                  name="name" // Pastikan ada properti name
+                  value={formData.name}
+                  onChange={handleChange}
                   className="w-full rounded-full border border-gray-300 py-3 pl-12 pr-4 outline-none transition-all focus:border-[#3C6660] focus:ring-2 focus:ring-[#3C6660]/10"
                   placeholder="John Doe"
                   required
@@ -84,6 +124,9 @@ const RegisterPage = () => {
                 </div>
                 <input 
                   type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   className="w-full rounded-full border border-gray-300 py-3 pl-12 pr-4 outline-none transition-all focus:border-[#3C6660] focus:ring-2 focus:ring-[#3C6660]/10"
                   placeholder="johndoe@gmail.com"
                   required
@@ -100,6 +143,9 @@ const RegisterPage = () => {
                 </div>
                 <input 
                   type={showPassword ? "text" : "password"} 
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
                   className="w-full rounded-full border border-gray-300 py-3 pl-12 pr-12 outline-none transition-all focus:border-[#3C6660] focus:ring-2 focus:ring-[#3C6660]/10"
                   placeholder="••••••••"
                   required
@@ -113,7 +159,7 @@ const RegisterPage = () => {
                 </button>
               </div>
               <p className="mt-2 ml-4 text-[11px] text-gray-500 font-medium italic">
-                Must be at least 12 characters with a symbol.
+                Must be at least 8 characters.
               </p>
             </div>
 
@@ -144,15 +190,19 @@ const RegisterPage = () => {
               </label>
             </div>
 
-            {/* Button */}
+            {/* Button dengan Loading */}
             <button 
               type="submit" 
-              className="mb-6 w-full rounded-full bg-[#3C6660] py-3.5 font-semibold text-white transition-all hover:bg-[#2b4844] hover:shadow-lg active:scale-[0.98]"
+              disabled={isLoading}
+              className="mb-6 flex w-full items-center justify-center rounded-full bg-[#3C6660] py-3.5 font-semibold text-white transition-all hover:bg-[#2b4844] hover:shadow-lg active:scale-[0.98] disabled:opacity-70"
             >
-              Create Account
+              {isLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                'Create Account'
+              )}
             </button>
 
-            {/* Link Back to Login */}
             <p className="text-center text-sm text-[#5C605C]">
               Already have an account?{' '}
               <Link to="/login" className="font-semibold text-[#3C6660] hover:underline">

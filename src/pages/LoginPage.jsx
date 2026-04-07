@@ -1,38 +1,63 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Eye, EyeOff, Loader2 } from 'lucide-react'; 
+import { Link, useNavigate } from 'react-router-dom'; 
+import { login } from '../services/authService'; 
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const togglePassword = () => setShowPassword(!showPassword);
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.type === 'email' ? 'email' : 'password']: e.target.value });
+  };
 
-  const togglePassword = () => {
-    setShowPassword(!showPassword);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const response = await login(formData.email, formData.password);
+      console.log('Login Berhasil:', response);
+      navigate('/home'); 
+    } catch (err) {
+      setError(err.message || 'Email atau password salah.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-[#FAF9F6] p-6">
       <div className="flex w-full max-w-md flex-col items-center">
         
-        {/* Header: Logo & Title */}
         <div className="mb-8 text-center">
-          <img 
-            src="images/logo.svg" 
-            alt="Logo" 
-            className="mx-auto block mb-4 h-16 w-16" 
-          />
+          <img src="images/logo.svg" alt="Logo" className="mx-auto block mb-4 h-16 w-16" />
           <h2 className="text-3xl font-bold text-gray-800 tracking-tight text-center">AtomizePlanner</h2>
           <p className="text-[#5C605C] mt-2">Return to your space of intentional productivity.</p>
         </div>
 
-        {/* Card Form */}
         <div className="w-full rounded-[40px] bg-white p-10 shadow-xl border border-gray-100 mb-6 text-left">
-          <form className="flex flex-col gap-4">
+          
+          {/* Tampilkan pesan error jika ada */}
+          {error && (
+            <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-500 border border-red-100">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             
             {/* Email Field */}
             <div>
               <label className="mb-1.5 ml-1 block text-sm font-semibold text-[#5C605C]">Email Address</label>
               <input 
                 type="email" 
+                value={formData.email}
+                onChange={handleChange}
                 className="w-full rounded-full border border-gray-300 py-3 px-5 outline-none transition-all focus:border-[#3C6660] focus:ring-2 focus:ring-[#3C6660]/10"
                 placeholder="johndoe@gmail.com"
                 required
@@ -43,10 +68,7 @@ const LoginPage = () => {
             <div>
               <div className="flex items-center justify-between mb-1.5 ml-1">
                 <label className="block text-sm font-semibold text-[#5C605C]">Password</label>
-                <Link 
-                  to="/forgot-password" 
-                  className="text-xs font-bold text-[#3C6660] hover:underline"
-                >
+                <Link to="/forgot-password" size={20} className="text-xs font-bold text-[#3C6660] hover:underline">
                   Forgot Password?
                 </Link>
               </div>
@@ -54,6 +76,8 @@ const LoginPage = () => {
               <div className="relative">
                 <input 
                   type={showPassword ? "text" : "password"} 
+                  value={formData.password}
+                  onChange={handleChange}
                   className="w-full rounded-full border border-gray-300 py-3 pl-5 pr-12 outline-none transition-all focus:border-[#3C6660] focus:ring-2 focus:ring-[#3C6660]/10"
                   placeholder="••••••••"
                   required
@@ -68,12 +92,17 @@ const LoginPage = () => {
               </div>
             </div>
 
-            {/* Sign In Button */}
+            {/* Sign In Button dengan Loading State */}
             <button 
               type="submit" 
-              className="mt-4 w-full rounded-full bg-[#3C6660] py-3.5 font-bold text-white transition-all hover:bg-[#2b4844] hover:shadow-lg active:scale-[0.98]"
+              disabled={isLoading}
+              className="mt-4 flex w-full items-center justify-center rounded-full bg-[#3C6660] py-3.5 font-bold text-white transition-all hover:bg-[#2b4844] hover:shadow-lg active:scale-[0.98] disabled:opacity-70"
             >
-              Sign In
+              {isLoading ? (
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              ) : (
+                'Sign In'
+              )}
             </button>
 
             {/* Divider */}
@@ -106,13 +135,9 @@ const LoginPage = () => {
           </form>
         </div>
         
-        {/* Footer Link */}
         <p className="text-center text-sm text-[#5C605C]">
           Don't have an account?{' '}
-          <Link 
-            to="/register" 
-            className="font-bold text-[#3C6660] hover:underline"
-          >
+          <Link to="/register" className="font-bold text-[#3C6660] hover:underline">
             Create Account
           </Link>
         </p>
