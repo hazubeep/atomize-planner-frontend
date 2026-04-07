@@ -130,10 +130,10 @@ const MainLayout = ({ children }) => {
                 to={path}
                 className={({ isActive }) =>
                   cn(
-                    'pb-0.5 text-[12px] no-underline sm:text-[13px]',
+                    "pb-0.5 text-[12px] no-underline sm:text-[13px]",
                     isActive
-                      ? 'border-b-[1.5px] border-accent font-semibold text-text-primary'
-                      : 'font-normal text-text-muted'
+                      ? "border-b-[1.5px] border-accent font-semibold text-text-primary"
+                      : "font-normal text-text-muted",
                   )
                 }
               >
@@ -219,7 +219,7 @@ const MainLayout = ({ children }) => {
 
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MainLayout
+export default MainLayout;
