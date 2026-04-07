@@ -1,7 +1,7 @@
 import api from './api';
 import { mockGetWeeklySummary, mockGetCompletedTasksHistory } from '../mock/mockService';
 
-const USE_MOCK = true;
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
 
 // GET /history/summary?week_offset=0
 export const getWeeklySummary = async (week_offset = 0) => {

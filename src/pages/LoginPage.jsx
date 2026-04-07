@@ -29,7 +29,7 @@ const LoginPage = () => {
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-[#FAF9F6] p-6">
       <div className="flex w-full max-w-md flex-col items-center">
-        
+
         {/* Header: Logo & Title */}
         <div className="mb-8 text-center">
           <img src="images/logo.svg" alt="Logo" className="mx-auto block mb-4 h-16 w-16" />
@@ -41,7 +41,7 @@ const LoginPage = () => {
         <div className="w-full rounded-[40px] bg-white p-10 shadow-xl border border-gray-100 mb-6 text-left">
           {error && <p className="mb-4 text-sm text-red-500 text-center">{error}</p>}
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-            
+
             {/* Email Field */}
             <div>
               <label className="mb-1.5 ml-1 block text-sm font-semibold text-[#5C605C]">Email Address</label>

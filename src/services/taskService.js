@@ -13,7 +13,7 @@ import {
   mockDeleteTaskStep,
 } from '../mock/mockService';
 
-const USE_MOCK = true;
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
 
 // GET /tasks
 export const getTasks = async (status) => {
@@ -88,8 +88,8 @@ export const markStepWorking = async (taskId, stepId) => {
 };
 
 // POST /tasks/:taskId/steps/:stepId/re-atomize
-export const reAtomizeStep = async (taskId, stepId, context_hint) => {
-  if (USE_MOCK) return mockReAtomizeStep(taskId, stepId, context_hint);
-  const res = await api.post(`/tasks/${taskId}/steps/${stepId}/re-atomize`, context_hint ? { context_hint } : {});
-  return res.data; // { success, message, data: { original_step_id, new_steps } }
-};
+// export const reAtomizeStep = async (taskId, stepId, context_hint) => {
+//   if (USE_MOCK) return mockReAtomizeStep(taskId, stepId, context_hint);
+//   const res = await api.post(`/tasks/${taskId}/steps/${stepId}/re-atomize`, context_hint ? { context_hint } : {});
+//   return res.data; // { success, message, data: { original_step_id, new_steps } }
+// };

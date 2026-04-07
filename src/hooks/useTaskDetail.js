@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { toggleTaskStep, markStepWorking as markStepWorkingApi, reAtomizeStep as reAtomizeStepApi, getTaskDetail, updateTaskStep } from '../services/taskService'
+import { toggleTaskStep, markStepWorking as markStepWorkingApi, getTaskDetail, updateTaskStep } from '../services/taskService'
 
 const useTaskDetail = (taskId, tasks, setTasks) => {
   const [error, setError] = useState(null)
@@ -84,20 +84,6 @@ const useTaskDetail = (taskId, tasks, setTasks) => {
     [taskId, refreshTaskInState]
   )
 
-  const reAtomizeStep = useCallback(
-    async (stepId, context_hint = '') => {
-      setError(null)
-      try {
-        await reAtomizeStepApi(taskId, stepId, context_hint)
-        await refreshTaskInState()
-      } catch (err) {
-        setError(err.message)
-        throw err
-      }
-    },
-    [taskId, refreshTaskInState]
-  )
-
   const editStep = useCallback(
     async (stepId, payload) => {
       setError(null)
@@ -112,7 +98,7 @@ const useTaskDetail = (taskId, tasks, setTasks) => {
     [taskId, refreshTaskInState]
   )
 
-  return { task, error, toggleStep, markStepWorking, reAtomizeStep, editStep }
+  return { task, error, toggleStep, markStepWorking, editStep }
 }
 
 export default useTaskDetail

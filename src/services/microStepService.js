@@ -1,7 +1,7 @@
 import api from './api';
 import { mockToggleTaskStep } from '../mock/mockService';
 
-const USE_MOCK = true;
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
 
 // PATCH /tasks/:taskId/steps/:stepId/toggle
 // signature (taskId, stepId, is_completed) 
