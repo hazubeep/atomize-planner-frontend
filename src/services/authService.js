@@ -10,7 +10,10 @@ export const login = async (email, password) => {
     return data
   }
   const res = await api.post('/auth/login', { email, password })
-  if (res.data?.token) localStorage.setItem('token', res.data.token)
+  const token = res.data?.data?.token; 
+  if (token) {
+    localStorage.setItem('token', token)
+  }
   return res.data
 }
 
