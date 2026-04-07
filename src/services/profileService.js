@@ -13,8 +13,13 @@ const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
 // GET /profile
 export const getProfile = async () => {
   if (USE_MOCK) return mockGetProfile();
+  try {
   const res = await api.get('/profile');
   return res.data; // { success, data: User }
+  } catch (error) {
+    console.error('profile error:', error)
+    throw error
+  }
 };
 
 // PATCH /profile
