@@ -9,9 +9,14 @@ export const login = async (email, password) => {
     localStorage.setItem('token', data.token)
     return data
   }
-  const res = await api.post('/auth/login', { email, password })
-  if (res.data?.token) localStorage.setItem('token', res.data.token)
-  return res.data
+  try {
+    const res = await api.post('/auth/login', { email, password })
+    if (res.data?.token) localStorage.setItem('token', res.data.token)
+    return res.data
+  } catch (error) {
+    console.error('Login error:', error)
+    throw error
+  }
 }
 
 export const register = async (payload) => {
