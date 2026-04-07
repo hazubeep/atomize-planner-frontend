@@ -35,8 +35,12 @@ api.interceptors.response.use(
       error.response?.data?.message ||
       error.message ||
       'Terjadi kesalahan. Silakan coba lagi.'
+    const customError = new Error(message)
+    if (error.response?.data?.errors) {
+      customError.errors = error.response.data.errors
+    }
 
-    return Promise.reject(new Error(message))
+    return Promise.reject(customError)
   }
 )
 
