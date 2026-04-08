@@ -1,24 +1,43 @@
-// src/pages/StatsPage.jsx
-import React, { useState } from 'react';
-import { Zap, Activity, Target, MousePointer2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Zap, Activity, Target, MousePointer2, Loader2 } from 'lucide-react';
 import WeeklyTrend from '../components/stats/WeeklyTrend';
 import IntensityHeatmap from '../components/stats/IntensityHeatmap';
 import MetricCard from '../components/stats/MetricCard';
+// Import service baru kita
+import { mockGetPerformanceStats } from '../mock/mockService';
 
 const StatsPage = () => {
-  // Data simulasi (nanti diganti dengan fetch API dari Laravel)
-  const [statsData] = useState({
-    weeklyTrend: [40, 70, 45, 90, 65, 80, 50],
-    peakTime: "09:45",
-    heatmap: Array.from({ length: 154 }, () => Math.floor(Math.random() * 4)),
-    categories: [
-      { label: 'Strategic Planning', val: 40 },
-      { label: 'Creative Execution', val: 28 },
-      { label: 'Deep Research', val: 15 },
-      { label: 'Communication', val: 15 }
-    ],
-    atomizationRate: 8.4
-  });
+  const [statsData, setStatsData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await mockGetPerformanceStats();
+        if (response.success) {
+          setStatsData(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  // Tampilkan loader jika data sedang diambil
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <Loader2 className="animate-spin text-[#3C6660]" size={40} />
+      </div>
+    );
+  }
+
+  // Jika data gagal dimuat atau null
+  if (!statsData) return null;
 
   return (
     <div className="min-h-screen bg-white p-6 md:p-12">
@@ -44,7 +63,7 @@ const StatsPage = () => {
               <p className="text-white/50 text-xs mt-1">Based on deep work sessions</p>
             </div>
             <div>
-              <h2 className="text-5xl font-semibold text-[#DCFFF8] mb-1">09:45</h2>
+              <h2 className="text-5xl font-semibold text-[#DCFFF8] mb-1">{statsData.peakTime}</h2>
               <p className="text-xs font-bold text-white/70 uppercase tracking-widest">Morning Peak</p>
             </div>
           </div>
@@ -53,7 +72,7 @@ const StatsPage = () => {
         {/* Row 2: Heatmap */}
         <IntensityHeatmap data={statsData.heatmap} />
 
-        {/* Row 3: Categories & Atomization (Tetap di Page karena unik) */}
+        {/* Row 3: Categories & Atomization */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 text-left">
           <div className="bg-[#F7F7F5] p-8 rounded-[40px]">
             <h3 className="font-bold text-gray-800 text-sm mb-8">Top Task Categories</h3>
@@ -65,7 +84,10 @@ const StatsPage = () => {
                     <span className="text-gray-400">{cat.val}%</span>
                   </div>
                   <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
-                    <div style={{ width: `${cat.val}%` }} className="h-full bg-[#1C4641]" />
+                    <div 
+                      style={{ width: `${cat.val}%` }} 
+                      className="h-full bg-[#1C4641] transition-all duration-1000" 
+                    />
                   </div>
                 </div>
               ))}
@@ -88,9 +110,21 @@ const StatsPage = () => {
 
         {/* Row 4: Metric Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <MetricCard icon={Activity} title="Consistency Peak" desc="You've maintained a 4-day focus streak. Your output is 12% higher than last week.." />
-          <MetricCard icon={Target} title="Cognitive Drift" desc="Focus starts dipping after 14:00. Consider scheduling high-effort tasks earlier." />
-          <MetricCard icon={MousePointer2} title="Efficiency Rating" desc="You are in the top 5% of Atomizers globally for project decomposition speed." />
+          <MetricCard 
+            icon={Activity} 
+            title="Consistency Peak" 
+            desc={statsData.metrics.consistency} 
+          />
+          <MetricCard 
+            icon={Target} 
+            title="Cognitive Drift" 
+            desc={statsData.metrics.drift} 
+          />
+          <MetricCard 
+            icon={MousePointer2} 
+            title="Efficiency Rating" 
+            desc={statsData.metrics.rating} 
+          />
         </div>
 
       </div>
