@@ -499,3 +499,27 @@ export const mockUpdateFocusSessionSettings = async (sessionId, payload) => {
   return { success: true, data: activeFocusSession }
 }
 
+export const mockGetPerformanceStats = async () => {
+  await delay(600);
+  return {
+    success: true,
+    data: {
+      weeklyTrend: [40, 70, 45, 90, 65, 80, 50],
+      peakTime: "09:45",
+      // Heatmap 154 kotak (22 kolom x 7 baris)
+      heatmap: Array.from({ length: 154 }, () => Math.floor(Math.random() * 4)),
+      categories: [
+        { label: 'Strategic Planning', val: 40 },
+        { label: 'Creative Execution', val: 28 },
+        { label: 'Deep Research', val: 15 },
+        { label: 'Communication', val: 15 }
+      ],
+      atomizationRate: 8.4,
+      metrics: {
+        consistency: "You've maintained a 4-day focus streak. Your output is 12% higher than last week.",
+        drift: "Focus starts dipping after 14:00. Consider scheduling high-effort tasks earlier.",
+        rating: "You are in the top 5% of Atomizers globally for project decomposition speed."
+      }
+    }
+  };
+};

@@ -8,7 +8,6 @@ const NAV_LINKS = [
   { path: '/home', label: 'Hub' },
   { path: '/goals', label: 'Goals' },
   { path: '/history', label: 'History' },
-  { path: '/stats', label: 'Stats' },
 ]
 
 const MainLayout = ({ children }) => {
@@ -160,7 +159,7 @@ const MainLayout = ({ children }) => {
 
         {/* ── Main content ── */}
         <main className="flex min-h-0 flex-1 justify-center overflow-y-auto px-5 pb-20 sm:pb-0 sm:px-8">
-          <div className="w-full max-w-[760px]">
+          <div className="w-full max-w-auto">
             {children}
           </div>
         </main>
