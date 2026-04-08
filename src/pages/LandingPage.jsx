@@ -6,20 +6,11 @@ import TestimonialSection from '../components/organisms/TestimonialSection'
 import CtaSection from '../components/organisms/CtaSection'
 import LandingNavbar from '../components/organisms/LandingNavbar'
 import LandingFooter from '../components/organisms/LandingFooter'
-import heroImg from '../assets/tampilan_chat.png'
+import heroImg from '../assets/gambar_chat.svg'
 
 const HeroMockup = () => (
-  <div className="relative w-full md:max-w-[clamp(820px,66vw,1320px)]">
-    <img src={heroImg} alt="app preview" className="block w-full rounded-[20px]" />
-    <div className="absolute bottom-[4%] left-[3%] flex items-center gap-2 rounded-[14px] border border-border bg-white p-[2%_3%] shadow-md">
-      <span className="text-[clamp(12px,1.4vw,20px)]">⚡</span>
-      <div>
-        <p className="text-[clamp(8px,0.9vw,12px)] font-extrabold uppercase tracking-wide text-text-muted">
-          Focus Level
-        </p>
-        <p className="text-[clamp(11px,1.2vw,18px)] font-extrabold text-accent">98% Peak</p>
-      </div>
-    </div>
+  <div className="relative w-full mx-auto max-w-[350px] md:max-w-[450px] lg:max-w-[500px]">
+    <img src={heroImg} alt="app preview" />
   </div>
 )
 
@@ -32,7 +23,7 @@ const LandingPage = () => {
 
       <div id="top" />
 
-      <div className="flex-1 bg-[radial-gradient(ellipse_at_top_right,#BFEBE433_0%,transparent_55%)]">
+      <div className="flex-1">
         <Section className="pt-20 pb-6 md:pt-24 md:pb-10" innerClassName="h-full">
           <div className="flex flex-col items-center gap-6 md:grid md:grid-cols-[0.85fr_1.15fr] md:items-start">
             <div className="relative z-[2] w-full font-['Manrope',sans-serif] text-center md:text-left order-1 md:order-1 md:row-start-1">
