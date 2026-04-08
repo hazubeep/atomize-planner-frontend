@@ -70,7 +70,7 @@ const LandingNavbar = () => {
         <div className="flex flex-1 items-center justify-end">
           <button
             type="button"
-            onClick={() => navigate('/home')}
+            onClick={() => navigate('/login')}
             className="cursor-pointer rounded-lg border-none bg-accent px-[18px] py-[7px] text-xs font-semibold text-white"
           >
             Get Started
