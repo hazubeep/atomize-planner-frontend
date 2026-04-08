@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import pensilIcon from '../../assets/pensil.svg'
+import defaultAvatar from '../../assets/default-avatar.svg'
 
 const AvatarCard = ({ profile, onUpload, saving }) => {
   const fileInputRef = useRef(null)
@@ -11,10 +12,27 @@ const AvatarCard = ({ profile, onUpload, saving }) => {
     }
   }
 
+  const getImageUrl = (url) => {
+    if (!url || typeof url !== "string") {
+      return defaultAvatar
+    }
+
+    if (url.startsWith("http")) {
+      return url
+    }
+
+    return `http://127.0.0.1:8000${url}`
+  }
+  console.log("AVATAR URL:", getImageUrl(profile.avatar_url))
+
   return (
     <div className="h-fit rounded-[18px] bg-[#F4F4F0] p-5">
       <div className="relative mx-auto mb-4 h-28 w-28">
-        <img src={profile.avatar_url || '/src/assets/avatar.png'} alt="Avatar" className="h-full w-full rounded-full object-cover" />
+       <img 
+        src={getImageUrl(profile.avatar_url)} 
+        alt="Avatar" 
+        className="h-full w-full rounded-full object-cover" 
+        />
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
@@ -36,7 +54,9 @@ const AvatarCard = ({ profile, onUpload, saving }) => {
         Change Photo
       </button>
     </div>
+
   )
+  
 }
 
 export default AvatarCard
