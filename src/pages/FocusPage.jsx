@@ -31,32 +31,52 @@ const StepRow = ({ step, isCurrent, toggling, onStartFocus, onEdit, onMarkWorkin
   const [isEditing, setIsEditing] = useState(false)
   const [editTitle, setEditTitle] = useState(step.title)
   const [editDesc, setEditDesc] = useState(step.description || '')
-  
+
   const done = step.is_completed
 
+  const handleEditClick = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsEditing(true)
+  }
+
   const handleSave = async (e) => {
+    e.preventDefault()
     e.stopPropagation()
     if (onEdit) {
       await onEdit(step.id, { title: editTitle, description: editDesc })
     }
     setIsEditing(false)
+    window.location.reload()
   }
 
   const handleCancel = (e) => {
+    e.preventDefault()
     e.stopPropagation()
     setEditTitle(step.title)
     setEditDesc(step.description || '')
     setIsEditing(false)
   }
 
+  const handleRowClick = (e) => {
+    // Jangan trigger onStartFocus jika sedang editing atau klik dari action buttons
+    if (isEditing) return
+    if (!isCurrent) return
+    onStartFocus?.()
+  }
+
   if (isEditing) {
     return (
-      <div className={cn(
-        'mb-1.5 rounded-[14px] border border-border bg-white p-3.5 shadow-[0_2px_12px_rgba(0,0,0,0.07)]',
-        toggling && 'opacity-50 pointer-events-none'
-      )}>
+      <div
+        className={cn(
+          'mb-1.5 rounded-[14px] border border-border bg-white p-3.5 shadow-[0_2px_12px_rgba(0,0,0,0.07)]',
+          toggling && 'opacity-50 pointer-events-none'
+        )}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex flex-col gap-2">
           <input
+            autoFocus
             type="text"
             value={editTitle}
             onChange={(e) => setEditTitle(e.target.value)}
@@ -72,12 +92,14 @@ const StepRow = ({ step, isCurrent, toggling, onStartFocus, onEdit, onMarkWorkin
           />
           <div className="mt-1 flex justify-end gap-2">
             <button
+              type="button"
               onClick={handleCancel}
               className="cursor-pointer rounded bg-transparent px-3 py-1.5 text-xs font-medium text-text-secondary border border-border"
             >
               Cancel
             </button>
             <button
+              type="button"
               onClick={handleSave}
               className="cursor-pointer rounded bg-[#3C6660] px-3 py-1.5 text-xs font-medium text-white transition hover:brightness-90"
             >
@@ -93,7 +115,7 @@ const StepRow = ({ step, isCurrent, toggling, onStartFocus, onEdit, onMarkWorkin
     <div
       role={isCurrent ? 'button' : undefined}
       tabIndex={isCurrent ? 0 : undefined}
-      onClick={isCurrent ? onStartFocus : undefined}
+      onClick={handleRowClick}
       onKeyDown={
         isCurrent
           ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onStartFocus?.() } }
@@ -135,7 +157,10 @@ const StepRow = ({ step, isCurrent, toggling, onStartFocus, onEdit, onMarkWorkin
             <p className="mt-1 text-xs leading-relaxed text-text-muted">{step.description}</p>
           )}
           {isCurrent && (
-            <div className="mt-3 flex gap-2" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="mt-3 flex gap-2"
+              onClick={(e) => e.stopPropagation()}
+            >
               <button
                 type="button"
                 onClick={async (e) => { e.stopPropagation(); await onMarkWorking?.(); onStartFocus?.() }}
@@ -146,7 +171,7 @@ const StepRow = ({ step, isCurrent, toggling, onStartFocus, onEdit, onMarkWorkin
               </button>
               <button
                 type="button"
-                onClick={(e) => { e.stopPropagation(); setIsEditing(true) }}
+                onClick={handleEditClick}
                 className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-transparent px-3 py-1.5 text-xs font-medium text-text-secondary"
               >
                 <img src={icon_pensil} alt="edit" width="12" height="12" />

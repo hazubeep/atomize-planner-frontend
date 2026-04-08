@@ -6,7 +6,6 @@ import {
   getActiveFocusSession,
   completeFocusSession,
   cancelFocusSession,
-  updateFocusSessionSettings,
 } from '../services/focusService'
 import Spinner from '../components/atoms/Spinner'
 
@@ -205,13 +204,7 @@ const DeepFocusPage = () => {
     setIsRunning(false)
     setSettingsOpen(false)
 
-    if (currentSession?.session_id) {
-      try {
-        await updateFocusSessionSettings(currentSession.session_id, { duration_minutes: Math.round(w / 60) })
-      } catch (err) {
-        setSessionError(err?.error?.message || err?.message || 'Failed to update session settings')
-      }
-    }
+    // Settings sudah disimpan di localStorage, tidak perlu sync ke API
   }
 
   if (sessionLoading) {
