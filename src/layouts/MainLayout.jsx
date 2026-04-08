@@ -60,7 +60,7 @@ const MainLayout = ({ children }) => {
     try { await logout() } catch (err) { console.error('Logout error', err) } finally {
       setProfileOpen(false)
       setDrawerOpen(false)
-      navigate('/register', { replace: true })
+      navigate('/login', { replace: true })
     }
   }
 

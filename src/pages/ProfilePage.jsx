@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect,  useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getProfile, updateProfile, deleteAccount, uploadAvatar, changePassword } from '../services/profileService'
 import AvatarCard from '../components/Profile/AvatarCard'
@@ -10,7 +10,7 @@ const parseError = (err) => err?.error?.message || err?.message || 'Terjadi kesa
 
 const ProfilePage = () => {
   const navigate = useNavigate()
-  const fileInputRef = useRef(null)
+  // const fileInputRef = useRef(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
