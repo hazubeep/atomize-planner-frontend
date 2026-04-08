@@ -13,7 +13,6 @@ import MainLayout from '../layouts/MainLayout'
 import HomePage from '../pages/HomePage'
 import GoalsPage from '../pages/GoalsPage'
 import FocusPage from '../pages/FocusPage'
-import StatsPage from '../pages/StatsPage'
 import HistoryPage from '../pages/HistoryPage'
 import ProfilePage from '../pages/ProfilePage'
 import DeepFocusPage from '../pages/DeepFocusMode'
@@ -30,7 +29,6 @@ const AppLayout = () => (
     <Route element={<MainLayoutShell />}>
       <Route path="/home" element={<HomePage />} />
       <Route path="/focus" element={<FocusPage />} />
-      <Route path="/stats" element={<StatsPage />} />
       <Route path="/goals" element={<GoalsPage />} />
       <Route path="/history" element={<HistoryPage />} />
       <Route path="/profile" element={<ProfilePage />} />
