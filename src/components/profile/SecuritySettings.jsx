@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import Input from '../atoms/Input'
+import Input from '../Atoms/Input'
 import securityIcon from '../../assets/security_icon.svg'
 
 const SecuritySettings = ({

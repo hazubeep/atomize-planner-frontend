@@ -1,4 +1,4 @@
-import Section from '../atoms/Section'
+import Section from '../Atoms/Section'
 import avatarImg from '../../assets/avatar.png'
 
 const TestimonialSection = () => (
