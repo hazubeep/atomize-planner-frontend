@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useTasks from '../hooks/useTasks'
-import useTaskDetail from '../hooks/useTaskDetail'
 import {
   getActiveFocusSession,
   completeFocusSession,
   cancelFocusSession,
-  updateFocusSessionSettings,
 } from '../services/focusService'
+import { updateTaskStep } from '../services/taskService'
 import Spinner from '../components/atoms/Spinner'
 
 import tandaPanah from '../assets/tanda_panah.svg'
@@ -81,9 +80,7 @@ const DeepFocusPage = () => {
   const location = useLocation()
   const { taskId, stepId } = location.state || {}
 
-  const { tasks, setTasks } = useTasks()
-  const safeTaskKey = taskId != null && String(taskId) !== '' ? String(taskId) : '__no_task__'
-  const { toggleStep } = useTaskDetail(safeTaskKey, tasks, setTasks)
+  const { tasks } = useTasks()
 
   const [currentSession, setCurrentSession] = useState(null)
   const [sessionLoading, setSessionLoading] = useState(true)
@@ -171,16 +168,25 @@ const DeepFocusPage = () => {
     setCompleting(true)
     setSessionError(null)
     try {
+      // Selesaikan sesi fokus jika ada, tapi jangan biarkan error sesi
+      // mencegah step untuk di-ceklis
       if (currentSession?.session_id) {
-        await completeFocusSession(currentSession.session_id)
+        try {
+          await completeFocusSession(currentSession.session_id)
+        } catch (err) {
+          console.error('Complete session error (continuing to mark step):', err)
+        }
       }
+
+      // Force set step ke completed (bukan toggle, supaya tidak bisa balik)
       if (taskId != null && stepId != null) {
-        await toggleStep(stepId, false)
+        await updateTaskStep(taskId, stepId, { is_completed: true, status: 'completed' })
       }
+
       setCurrentSession(null)
       navigate('/focus', { state: { taskId } })
     } catch (err) {
-      const msg = err?.error?.message || err?.message || 'Failed to complete focus session'
+      const msg = err?.error?.message || err?.message || 'Failed to mark step as done'
       setSessionError(msg)
     } finally {
       setCompleting(false)
@@ -205,13 +211,7 @@ const DeepFocusPage = () => {
     setIsRunning(false)
     setSettingsOpen(false)
 
-    if (currentSession?.session_id) {
-      try {
-        await updateFocusSessionSettings(currentSession.session_id, { duration_minutes: Math.round(w / 60) })
-      } catch (err) {
-        setSessionError(err?.error?.message || err?.message || 'Failed to update session settings')
-      }
-    }
+    // Settings sudah disimpan di localStorage, tidak perlu sync ke API
   }
 
   if (sessionLoading) {
