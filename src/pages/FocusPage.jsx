@@ -1,9 +1,10 @@
 import { useNavigate, useLocation } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react' 
 import { cn } from '../utils'
 import useTasks from '../hooks/useTasks'
 import useTaskDetail from '../hooks/useTaskDetail'
 import { startFocusSession } from '../services/focusService'
+import api from '../services/api' 
 import Spinner from '../components/atoms/Spinner'
 import ErrorMessage from '../components/atoms/ErrorMessage'
 import AddGoalButton from '../components/molecules/AddGoalButton'
@@ -59,7 +60,6 @@ const StepRow = ({ step, isCurrent, toggling, onStartFocus, onEdit, onMarkWorkin
   }
 
   const handleRowClick = (e) => {
-    // Jangan trigger onStartFocus jika sedang editing atau klik dari action buttons
     if (isEditing) return
     if (!isCurrent) return
     onStartFocus?.()
@@ -201,13 +201,39 @@ const FocusPage = () => {
     null
 
   const { task, markStepWorking, editStep } = useTaskDetail(String(focusId), tasks, setTasks)
-  // use task_steps (API v4) with fallback to micro_steps
+  
   const steps = task?.task_steps ?? task?.micro_steps ?? []
   const total = steps.length
   const done = steps.filter((s) => s.is_completed).length
   const progress = total > 0 ? Math.round((done / total) * 100) : 0
   const currentIdx = steps.findIndex((s) => !s.is_completed && s.status !== 'completed')
 
+  // --- LOGIC AUTO-COMPLETE FRONTEND ---
+  useEffect(() => {
+    const triggerAutoComplete = async () => {
+      // Jika semua step sudah dicentang (is_completed) tapi status task di DB belum 'completed'
+      if (task && total > 0 && done === total && task.status !== 'completed') {
+        try {
+          console.log("Detect: All steps finished. Moving task to history...");
+          
+          // Request ke Laravel untuk mengubah status task utama
+          const response = await api.patch(`/tasks/${task.id}`, { 
+            status: 'completed' 
+          });
+
+          if (response.status === 200 || response.data.success) {
+            // Setelah backend berhasil memindahkan data ke snapshot, pindah ke halaman history
+            navigate('/history');
+          }
+        } catch (err) {
+          console.error('Auto-complete failed:', err);
+        }
+      }
+    };
+
+    triggerAutoComplete();
+  }, [done, total, task, navigate]);
+  // ------------------------------------
 
   const handleStartFocus = async (taskId, stepId) => {
     if (!taskId || !stepId) return
@@ -261,7 +287,6 @@ const FocusPage = () => {
               ))}
             </div>
 
-            {/* AI Suggestion */}
             <div className="mx-auto w-full max-w-md rounded-2xl border border-border bg-white p-4 text-center">
               <div className="mb-2 flex items-center justify-center gap-[7px]">
                 <span className="text-lg">💡</span>
