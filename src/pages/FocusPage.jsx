@@ -208,31 +208,16 @@ const FocusPage = () => {
   const progress = total > 0 ? Math.round((done / total) * 100) : 0
   const currentIdx = steps.findIndex((s) => !s.is_completed && s.status !== 'completed')
 
-  // --- LOGIC AUTO-COMPLETE FRONTEND ---
   useEffect(() => {
-    const triggerAutoComplete = async () => {
-      // Jika semua step sudah dicentang (is_completed) tapi status task di DB belum 'completed'
-      if (task && total > 0 && done === total && task.status !== 'completed') {
-        try {
-          console.log("Detect: All steps finished. Moving task to history...");
-          
-          // Request ke Laravel untuk mengubah status task utama
-          const response = await api.patch(`/tasks/${task.id}`, { 
-            status: 'completed' 
-          });
+  if (task && total > 0 && done === total) {
+    const timer = setTimeout(() => {
+      console.log("Semua step selesai! Mengarahkan ke History...");
+      navigate('/history');
+    }, 1500); 
 
-          if (response.status === 200 || response.data.success) {
-            // Setelah backend berhasil memindahkan data ke snapshot, pindah ke halaman history
-            navigate('/history');
-          }
-        } catch (err) {
-          console.error('Auto-complete failed:', err);
-        }
-      }
-    };
-
-    triggerAutoComplete();
-  }, [done, total, task, navigate]);
+    return () => clearTimeout(timer);
+  }
+}, [done, total, task, navigate]);
   // ------------------------------------
 
   const handleStartFocus = async (taskId, stepId) => {
