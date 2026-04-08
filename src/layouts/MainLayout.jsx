@@ -57,7 +57,13 @@ const MainLayout = ({ children }) => {
   }, [drawerOpen])
 
   const handleLogout = async () => {
-    try { await logout() } catch (err) { console.error('Logout error', err) } finally {
+    try { 
+      await logout() 
+    } catch (err) { 
+      console.error('Logout error', err) 
+    } finally {
+      setAvatarUrl(null)     // 🔥 penting
+      setUserName('')        // 🔥 penting
       setProfileOpen(false)
       setDrawerOpen(false)
       navigate('/login', { replace: true })

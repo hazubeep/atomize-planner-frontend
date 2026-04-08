@@ -59,8 +59,19 @@ const ProfilePage = () => {
     try {
       const formData = new FormData()
       formData.append('avatar', file)
-      const res = await uploadAvatar(formData)
-      setProfile((prev) => ({ ...prev, avatar_url: res?.data?.avatar_url ?? null }))
+      const res = await uploadAvatar(formData)     
+      console.log("UPLOAD RESPONSE:", res)
+
+      const newAvatar =
+        res?.data?.avatar_url ||
+        res?.data?.avatar ||
+        res?.avatar_url ||
+        res?.avatar
+
+      setProfile((prev) => ({
+        ...prev,
+        avatar_url: newAvatar
+      }))
       showFeedback('Foto profil berhasil diubah.')
     } catch (err) {
       showFeedback(parseError(err), true)
