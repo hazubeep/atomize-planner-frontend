@@ -243,7 +243,7 @@ const FocusPage = () => {
 
     try {
       const active = await getActiveFocusSession()
-      console.log("ACTIVE SESSION:", active)
+      console.log("ACTIVE SESSION")
 
       if (active?.data?.session_id) {
         console.log("Cancelling previous session...")
