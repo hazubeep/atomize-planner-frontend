@@ -10,6 +10,8 @@ import ErrorMessage from '../components/atoms/ErrorMessage'
 import AddGoalButton from '../components/molecules/AddGoalButton'
 import ProgressSection from '../components/atoms/ProgressSection'
 import icon_pensil from '../assets/pensil.svg'
+import { getActiveFocusSession } from '../services/focusService'
+import { cancelFocusSession } from '../services/focusService'
 
 const CircleDone = () => (
   <div className="mt-0.5 flex h-[22px] w-[22px] flex-shrink-0 items-center justify-center rounded-full bg-accent">
@@ -32,6 +34,7 @@ const StepRow = ({ step, isCurrent, toggling, onStartFocus, onEdit, onMarkWorkin
   const [isEditing, setIsEditing] = useState(false)
   const [editTitle, setEditTitle] = useState(step.title)
   const [editDesc, setEditDesc] = useState(step.description || '')
+
 
   const done = step.is_completed
 
@@ -208,24 +211,54 @@ const FocusPage = () => {
   const progress = total > 0 ? Math.round((done / total) * 100) : 0
   const currentIdx = steps.findIndex((s) => !s.is_completed && s.status !== 'completed')
 
+  // --- LOGIC AUTO-COMPLETE FRONTEND ---
   useEffect(() => {
-  if (task && total > 0 && done === total) {
-    const timer = setTimeout(() => {
-      console.log("Semua step selesai! Mengarahkan ke History...");
-      navigate('/history');
-    }, 1500); 
+    const triggerAutoComplete = async () => {
+      // Jika semua step sudah dicentang (is_completed) tapi status task di DB belum 'completed'
+      if (task && total > 0 && done === total && task.status !== 'completed') {
+        try {
+          console.log("Detect: All steps finished. Moving task to history...");
+          
+          // Request ke Laravel untuk mengubah status task utama
+          const response = await api.patch(`/tasks/${task.id}`, { 
+            status: 'completed' 
+          });
 
-    return () => clearTimeout(timer);
-  }
-}, [done, total, task, navigate]);
+          if (response.status === 200 || response.data.success) {
+            // Setelah backend berhasil memindahkan data ke snapshot, pindah ke halaman history
+            navigate('/history');
+          }
+        } catch (err) {
+          console.error('Auto-complete failed:', err);
+        }
+      }
+    };
+
+    triggerAutoComplete();
+  }, [done, total, task, navigate]);
   // ------------------------------------
 
   const handleStartFocus = async (taskId, stepId) => {
     if (!taskId || !stepId) return
+
     try {
-      await startFocusSession({ task_id: taskId, step_id: stepId, duration_minutes: 25 })
+      const active = await getActiveFocusSession()
+      console.log("ACTIVE SESSION:", active)
+
+      if (active?.data?.session_id) {
+        console.log("Cancelling previous session...")
+
+        await cancelFocusSession(active.data.session_id)
+      }
+
+      await startFocusSession({
+        task_id: taskId,
+        step_id: stepId,
+        duration_minutes: 25
+      })
+
     } catch (err) {
-      console.error('Start focus session error (continuing navigation anyway):', err)
+      console.error('Start focus session error:', err)
     } finally {
       navigate('/DeepFocus', { state: { taskId, stepId } })
     }

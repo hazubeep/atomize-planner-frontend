@@ -60,7 +60,6 @@ const ProfilePage = () => {
       const formData = new FormData()
       formData.append('avatar', file)
       const res = await uploadAvatar(formData)     
-      console.log("UPLOAD RESPONSE:", res)
 
       const newAvatar =
         res?.data?.avatar_url ||

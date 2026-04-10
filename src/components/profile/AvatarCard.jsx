@@ -23,7 +23,6 @@ const AvatarCard = ({ profile, onUpload, saving }) => {
 
     return `http://127.0.0.1:8000${url}`
   }
-  console.log("AVATAR URL:", getImageUrl(profile.avatar_url))
 
   return (
     <div className="h-fit rounded-[18px] bg-[#F4F4F0] p-5">

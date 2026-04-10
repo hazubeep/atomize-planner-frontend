@@ -12,8 +12,15 @@ const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
 // POST /focus/sessions
 export const startFocusSession = async (payload) => {
   if (USE_MOCK) return mockStartFocusSession(payload);
-  const res = await api.post('/focus/sessions', payload);
-  return res.data; // { success, data: FocusSession }
+  try {
+    const res = await api.post('/focus/sessions', payload)
+    return res.data
+  } catch (err) {
+    if (err.message.includes('409')) {
+      return { alreadyExists: true }
+    }
+    throw err
+  }
 };
 
 // GET /focus/sessions/active
