@@ -27,7 +27,9 @@ const RegisterPage = () => {
 
     try {
       const response = await register(formData);
-      console.log('Registrasi Berhasil:', response);
+      if (response){
+      console.log('Registrasi Berhasil');
+      }
       navigate('/home'); 
     } catch (err) {
       setError(err.message || 'Gagal membuat akun. Silakan coba lagi.');

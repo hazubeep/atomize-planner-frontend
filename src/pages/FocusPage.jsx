@@ -62,7 +62,7 @@ const StepRow = ({ step, isCurrent, toggling, onStartFocus, onEdit, onMarkWorkin
     setIsEditing(false)
   }
 
-  const handleRowClick = (e) => {
+  const handleRowClick = () => {
     if (isEditing) return
     if (!isCurrent) return
     onStartFocus?.()

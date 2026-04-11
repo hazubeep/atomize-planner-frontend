@@ -61,8 +61,8 @@ const MainLayout = ({ children }) => {
     } catch (err) { 
       console.error('Logout error', err) 
     } finally {
-      setAvatarUrl(null)     // 🔥 penting
-      setUserName('')        // 🔥 penting
+      setAvatarUrl(null)     
+      setUserName('')       
       setProfileOpen(false)
       setDrawerOpen(false)
       navigate('/login', { replace: true })

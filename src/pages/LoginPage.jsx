@@ -20,7 +20,9 @@ const LoginPage = () => {
 
     try {
       const response = await login(formData.email, formData.password);
-      console.log('Login Berhasil:', response);
+      if (response){
+      console.log('Login Berhasil');
+      }
       navigate('/home'); 
     } catch (err) {
       setError(err.message || 'Email atau password salah.');

@@ -1,5 +1,5 @@
-import api from './api.js'
-import { mockLogin, mockRegister, mockLogout } from '../mock/mockService.js'
+import api from './api'
+import { mockLogin, mockRegister, mockLogout } from '../mock/mockService'
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
 
