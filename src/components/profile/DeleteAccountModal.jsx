@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import Input from '../Atoms/Input'
+import Input from '../atoms/Input'
 
 const DeleteAccountModal = ({ isOpen, onClose, onConfirm, deleting, error }) => {
   const [deletePassword, setDeletePassword] = useState('')

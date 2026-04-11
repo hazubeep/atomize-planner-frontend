@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react'
 import { cn } from '../../utils'
-import Button from '../Atoms/Button'
-import Badge from '../Atoms/Badge'
+import Button from '../atoms/Button'
+import Badge from '../atoms/Badge'
 
 const StatusIcon = ({ status }) => {
   if (status === 'completed') {

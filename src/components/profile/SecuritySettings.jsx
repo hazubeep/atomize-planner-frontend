@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import Input from '../Atoms/Input'
+import Input from '../atoms/Input'
 import securityIcon from '../../assets/security_icon.svg'
 import { Eye, EyeOff } from 'lucide-react'
 

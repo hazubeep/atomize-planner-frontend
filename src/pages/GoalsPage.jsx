@@ -3,8 +3,8 @@ import useTasks from '../hooks/useTasks'
 import Spinner from '../components/atoms/Spinner'
 import ErrorMessage from '../components/atoms/ErrorMessage'
 import calmWorkspace from '../assets/Calm workspace.png'
-import TaskCard from '../components/Goals/TaskCard'
-import EmptyCard from '../components/Goals/EmptyCard'
+import TaskCard from '../components/goals/TaskCard'
+import EmptyCard from '../components/goals/EmptyCard'
 
 const GoalsPage = () => {
   const navigate = useNavigate()
