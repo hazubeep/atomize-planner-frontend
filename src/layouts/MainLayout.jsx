@@ -16,6 +16,7 @@ const MainLayout = ({ children }) => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [avatarUrl, setAvatarUrl] = useState(null)
   const [userName, setUserName] = useState('')
+  const [loggingOut, setLoggingOut] = useState(false)
   const desktopProfileRef = useRef(null)
   const mobileProfileRef = useRef(null)
 
@@ -56,16 +57,22 @@ const MainLayout = ({ children }) => {
   }, [drawerOpen])
 
   const handleLogout = async () => {
+    if (loggingOut) return  
+    setLoggingOut(true)
     try { 
       await logout() 
-    } catch (err) { 
-      console.error('Logout error', err) 
-    } finally {
+
       setAvatarUrl(null)     
       setUserName('')       
       setProfileOpen(false)
       setDrawerOpen(false)
+
       navigate('/login', { replace: true })
+
+    } catch (err) { 
+      console.error('Logout error', err) 
+    } finally {
+      setLoggingOut(false)
     }
   }
 

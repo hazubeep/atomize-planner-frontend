@@ -39,12 +39,11 @@ export const logout = async () => {
   try {
     if (USE_MOCK) {
       return await mockLogout()
-    }
+    }   
     const res = await api.post('/auth/logout')
+    localStorage.removeItem('token')
     return res.data
   } catch (error) {
     console.error('Logout error:', error)
-  } finally {
-    localStorage.removeItem('token')
   }
 }

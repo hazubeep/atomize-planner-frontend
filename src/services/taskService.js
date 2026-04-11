@@ -8,7 +8,6 @@ import {
   mockAddTaskStep,
   mockToggleTaskStep,
   mockMarkStepWorking,
-  mockReAtomizeStep,
   mockUpdateTaskStep,
   mockDeleteTaskStep,
 } from '../mock/mockService';
