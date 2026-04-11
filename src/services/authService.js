@@ -1,16 +1,18 @@
-import api from './api'
-import { mockLogin, mockRegister, mockLogout } from '../mock/mockService'
+import api from './api.js'
+import { mockLogin, mockRegister, mockLogout } from '../mock/mockService.js'
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
 
 export const login = async (email, password) => {
   if (USE_MOCK) {
     const data = await mockLogin({ email, password })
-    localStorage.setItem('token', data.token)
+    if (data?.token) {
+      localStorage.setItem('token', data.token)
+    }
     return data
   }
   const res = await api.post('/auth/login', { email, password })
-  const token = res.data?.data?.token; 
+  const token = res.data?.data?.token || res.data?.token
   if (token) {
     localStorage.setItem('token', token)
   }
@@ -18,20 +20,31 @@ export const login = async (email, password) => {
 }
 
 export const register = async (payload) => {
-  if (USE_MOCK) return mockRegister()
+  if (USE_MOCK) {
+    const data = await mockRegister(payload)
+    if (data?.token) {
+      localStorage.setItem('token', data.token)
+    }
+    return data
+  }
   const res = await api.post('/auth/register', payload)
-  if (res.data?.token) localStorage.setItem('token', res.data.token)
+  const token = res.data?.data?.token || res.data?.token
+  if (token) {
+    localStorage.setItem('token', token)
+  }
   return res.data
 }
 
 export const logout = async () => {
-  if (USE_MOCK) {
-    const res = await mockLogout()
+  try {
+    if (USE_MOCK) {
+      return await mockLogout()
+    }
+    const res = await api.post('/auth/logout')
+    return res.data
+  } catch (error) {
+    console.error('Logout error:', error)
+  } finally {
     localStorage.removeItem('token')
-    return res
   }
-  const res = await api.post('/auth/logout')
-  localStorage.removeItem('token')
-  return res.data
 }
-
