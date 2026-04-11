@@ -1,12 +1,111 @@
-# React + Vite
+# Atomize Planner Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Ini adalah repositori untuk frontend aplikasi Atomize Planner. Dibangun dengan React dan Vite, aplikasi ini dirancang untuk membantu pengguna mengelola tugas, meningkatkan fokus, dan melacak produktivitas mereka.
 
-Currently, two official plugins are available:
+## Fitur
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+-   Manajemen Tugas dan Sasaran (Goals)
+-   Mode Fokus Mendalam (Deep Focus Mode) dengan timer
+-   Pelacakan Riwayat dan Statistik Produktivitas
+-   Manajemen Profil Pengguna
+-   Antarmuka yang bersih dan modern
 
-## Expanding the ESLint configuration
+## Teknologi yang Digunakan
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+-   **Framework**: React.js
+-   **Build Tool**: Vite
+-   **Package Manager**: npm
+-   **Styling**: Tailwind CSS
+-   **Routing**: React Router
+-   **Linting**: ESLint
+
+## Prasyarat
+
+Sebelum memulai, pastikan Anda telah menginstal perangkat lunak berikut di sistem Anda:
+
+-   [Node.js](https://nodejs.org/) (v18 atau lebih baru direkomendasikan)
+-   [npm](https://npmjs.com/)
+
+## Instalasi
+
+Ikuti langkah-langkah berikut untuk menjalankan proyek ini secara lokal:
+
+1.  **Clone repositori ini:**
+    ```bash
+    git clone https://github.com/username/atomize-planner-frontend.git
+    ```
+
+2.  **Masuk ke direktori proyek:**
+    ```bash
+    cd atomize-planner-frontend
+    ```
+
+3.  **Instal semua dependensi menggunakan pnpm:**
+    ```bash
+    npm install
+    ```
+
+## Menjalankan Aplikasi
+
+### **Mode Pengembangan**
+
+Untuk menjalankan aplikasi dalam mode pengembangan dengan hot-reloading:
+
+```bash
+npm run dev
+```
+
+Aplikasi akan tersedia di `http://localhost:5173` (atau port lain jika 5173 sudah digunakan).
+
+### **Mode Produksi**
+
+1.  **Build aplikasi untuk produksi:**
+    ```bash
+    npm run build
+    ```
+    Perintah ini akan membuat direktori `dist` yang berisi file-file statis yang siap untuk di-deploy.
+
+2.  **Pratinjau hasil build secara lokal:**
+    ```bash
+    npm run preview
+    ```
+    Perintah ini akan menjalankan server lokal untuk menayangkan file dari direktori `dist`.
+
+## Skrip yang Tersedia
+
+Dalam file `package.json`, Anda akan menemukan beberapa skrip:
+
+-   `npm run dev`: Menjalankan server pengembangan Vite.
+-   `npm run build`: Mem-build aplikasi untuk lingkungan produksi.
+-   `npm run lint`: Menjalankan ESLint untuk menganalisis kode dan menemukan masalah.
+-   `npm run preview`: Menjalankan pratinjau lokal dari build produksi.
+
+## Struktur Folder
+
+Berikut adalah gambaran umum struktur folder dalam proyek ini:
+
+```
+/
+├── public/         # Aset statis
+├── src/
+│   ├── assets/       # Gambar, ikon, dan aset lainnya
+│   ├── components/   # Komponen React yang dapat digunakan kembali
+│   ├── constants/    # Konstanta global
+│   ├── hooks/        # Custom React hooks
+│   ├── layouts/      # Komponen tata letak halaman
+│   ├── mock/         # Data dan layanan mock untuk pengembangan
+│   ├── pages/        # Komponen utama untuk setiap halaman/rute
+│   ├── routes/       # Konfigurasi routing aplikasi
+│   ├── services/     # Logika untuk berinteraksi dengan API
+│   └── utils/        # Fungsi utilitas
+├── .gitignore
+├── eslint.config.js  # Konfigurasi ESLint
+├── index.html        # Template HTML utama
+├── package.json
+├── README.md
+└── vite.config.js    # Konfigurasi Vite
+```
+
+## Lisensi
+
+Proyek ini dilisensikan di bawah ketentuan yang terdapat dalam file `LICENSE`.
