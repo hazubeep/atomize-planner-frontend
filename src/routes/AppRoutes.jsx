@@ -4,7 +4,6 @@ import { Routes, Route, Outlet } from 'react-router-dom'
 
 // Public pages
 import LandingPage from '../pages/LandingPage'
-import MethodologyPage from '../pages/MethodologyPage'
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 
@@ -41,7 +40,6 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/methodology" element={<MethodologyPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/*" element={<AppLayout />} />
