@@ -1,10 +1,10 @@
 import { useEffect,  useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getProfile, updateProfile, deleteAccount, uploadAvatar, changePassword } from '../services/profileService'
-import AvatarCard from '../components/profile/AvatarCard'
-import AccountDetailsForm from '../components/profile/AccountDetailsForm'
-import SecuritySettings from '../components/profile/SecuritySettings'
-import DeleteAccountModal from '../components/profile/DeleteAccountModal'
+import AvatarCard from '../components/profilepage/AvatarCard'
+import AccountDetailsForm from '../components/profilepage/AccountDetailsForm'
+import SecuritySettings from '../components/profilepage/SecuritySettings'
+import DeleteAccountModal from '../components/profilepage/DeleteAccountModal'
 
 const parseError = (err) => err?.error?.message || err?.message || 'Terjadi kesalahan.'
 

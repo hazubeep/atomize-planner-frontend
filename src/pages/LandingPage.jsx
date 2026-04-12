@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom'
-import Section from '../components/atoms/Section'
-import ProcessSection from '../components/organisms/ProcessSection'
-import FeaturesSection from '../components/organisms/FeaturesSection'
-import TestimonialSection from '../components/organisms/TestimonialSection'
-import CtaSection from '../components/organisms/CtaSection'
-import LandingNavbar from '../components/organisms/LandingNavbar'
-import LandingFooter from '../components/organisms/LandingFooter'
+import Section from '../components/landingpage/Section'
+import ProcessSection from '../components/landingpage/ProcessSection'
+import FeaturesSection from '../components/landingpage/FeaturesSection'
+import TestimonialSection from '../components/landingpage/TestimonialSection'
+import CtaSection from '../components/landingpage/CtaSection'
+import LandingNavbar from '../components/landingpage/LandingNavbar'
+import LandingFooter from '../components/landingpage/LandingFooter'
 import heroImg from '../assets/gambar_chat.svg'
 
 const HeroMockup = () => (

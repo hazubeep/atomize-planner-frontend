@@ -1,5 +1,5 @@
 import { cn } from '../../utils'
-import Section from '../atoms/Section'
+import Section from './Section'
 import pensil from '../../assets/gambar_pensil.png'
 import bulat from '../../assets/lima_bulat.png'
 import kotak3 from '../../assets/kotak.svg'

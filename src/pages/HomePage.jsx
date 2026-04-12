@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Clock, Zap, Lightbulb } from 'lucide-react';
-import ChatInput from '../components/home/ChatInput';
-import FeatureCard from '../components/home/FeatureCard';
+import ChatInput from '../components/homepage/ChatInput';
+import FeatureCard from '../components/homepage/FeatureCard';
 import useTasks from '../hooks/useTasks';
-import Spinner from '../components/atoms/Spinner';
+import Spinner from '../components/homepage/Spinner';
 
 const HomePage = () => {
   const navigate = useNavigate();

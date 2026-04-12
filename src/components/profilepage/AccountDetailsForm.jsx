@@ -1,4 +1,4 @@
-import Input from '../atoms/Input'
+import Input from './Input'
 import accountIcon from '../../assets/account_icon.svg'
 
 const AccountDetailsForm = ({ fullName, email, setFullName, setEmail }) => {

@@ -1,4 +1,4 @@
-import Section from '../atoms/Section'
+import Section from './Section'
 import laptopImg from '../../assets/laptop.png'
 import spark from '../../assets/spark.svg'
 import kotak from '../../assets/kotak-kotak.svg'

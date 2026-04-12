@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom'
 import useTasks from '../hooks/useTasks'
-import Spinner from '../components/atoms/Spinner'
-import ErrorMessage from '../components/atoms/ErrorMessage'
+import Spinner from '../components/homepage/Spinner'
+import ErrorMessage from '../components/goalspage/ErrorMessage'
 import calmWorkspace from '../assets/Calm workspace.png'
-import TaskCard from '../components/goals/TaskCard'
-import EmptyCard from '../components/goals/EmptyCard'
+import TaskCard from '../components/goalspage/TaskCard'
+import EmptyCard from '../components/goalspage/EmptyCard'
 
 const GoalsPage = () => {
   const navigate = useNavigate()

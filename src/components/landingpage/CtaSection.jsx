@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import Section from '../atoms/Section'
+import Section from './Section'
 
 const CtaSection = () => {
   const navigate = useNavigate()

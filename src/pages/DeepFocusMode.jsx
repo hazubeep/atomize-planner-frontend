@@ -7,7 +7,7 @@ import {
   cancelFocusSession,
 } from '../services/focusService'
 import { updateTaskStep } from '../services/taskService'
-import Spinner from '../components/atoms/Spinner'
+import Spinner from '../components/homepage/Spinner'
 
 import tandaPanah from '../assets/tanda_panah.svg'
 import saveIcon from '../assets/save.svg'
@@ -15,8 +15,8 @@ import ceklisIcon from '../assets/ceklis.svg'
 import personIcon from '../assets/person.svg'
 import kotakFrame from '../assets/kotak_abu_abu.svg'
 import pengaturanIcon from '../assets/pengaturan_icon.svg'
-import TimerRing from '../components/deepfocus/TimerRing'
-import SettingsModal from '../components/deepfocus/SettingsModal'
+import TimerRing from '../components/deepfocusmode/TimerRing'
+import SettingsModal from '../components/deepfocusmode/SettingsModal'
 
 const LS_WORK = 'deepFocus_workSec'
 const LS_BREAK = 'deepFocus_breakSec'

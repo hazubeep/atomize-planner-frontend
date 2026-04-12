@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import StatCard from '../components/history/StatCard';
-import TimelineItem from '../components/history/TimelineItem';
+import StatCard from '../components/historypage/StatCard';
+import TimelineItem from '../components/historypage/TimelineItem';
 import { Zap, Loader2 } from 'lucide-react';
 import { getWeeklySummary, getCompletedTasksHistory } from '../services/historyService';
 
