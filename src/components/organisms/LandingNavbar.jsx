@@ -1,9 +1,11 @@
 import { cn } from '../../utils'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 
 const LandingNavbar = () => {
   const navigate = useNavigate()
   const location = useLocation()
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const navBtn = (active) =>
     cn(
@@ -20,6 +22,7 @@ const LandingNavbar = () => {
   }
 
   const goToFeatures = () => {
+    setMenuOpen(false)
     if (location.pathname !== '/') {
       navigate('/')
       setTimeout(() => scrollToId('features'), 0)
@@ -29,6 +32,7 @@ const LandingNavbar = () => {
   }
 
   const goToTop = () => {
+    setMenuOpen(false)
     if (location.pathname !== '/') {
       navigate('/')
       return
@@ -37,6 +41,7 @@ const LandingNavbar = () => {
   }
 
   const goToMethodology = () => {
+    setMenuOpen(false)
     if (location.pathname !== '/') {
       navigate('/')
       setTimeout(() => scrollToId('methodology'), 0)
@@ -47,7 +52,9 @@ const LandingNavbar = () => {
 
   return (
     <header className="fixed left-0 right-0 top-0 z-[1000] border-b border-border bg-[rgba(250,249,246,0.9)] backdrop-blur-md">
-      <div className="flex h-14 w-full items-center px-6 lg:px-16">
+      <div className="relative flex h-14 w-full items-center px-6 lg:px-16">
+
+        {/* Logo */}
         <div className="flex flex-1 items-center">
           <button
             type="button"
@@ -58,24 +65,68 @@ const LandingNavbar = () => {
           </button>
         </div>
 
-        <nav className="flex flex-1 justify-center gap-[18px]">
-          <button type="button" onClick={goToFeatures} className={navBtn(location.pathname === '/')}>
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex flex-1 justify-center gap-[18px]">
+          <button
+            type="button"
+            onClick={goToFeatures}
+            className={navBtn(location.pathname === '/')}
+          >
             Features
           </button>
-          <button type="button" onClick={goToMethodology} className={navBtn(location.pathname === '/')}>
+
+          <button
+            type="button"
+            onClick={goToMethodology}
+            className={navBtn(location.pathname === '/')}
+          >
             Methodology
           </button>
         </nav>
 
-        <div className="flex flex-1 items-center justify-end">
+        {/* Right side */}
+        <div className="flex flex-1 items-center justify-end gap-3">
+          {/* Desktop button */}
           <button
             type="button"
             onClick={() => navigate('/login')}
-            className="cursor-pointer rounded-lg border-none bg-accent px-[18px] py-[7px] text-xs font-semibold text-white"
+            className="hidden md:block cursor-pointer rounded-lg border-none bg-accent px-[18px] py-[7px] text-xs font-semibold text-white"
           >
             Get Started
           </button>
+
+          {/* Mobile hamburger */}
+          <button
+            className="md:hidden text-2xl"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            {menuOpen ? '✕' : '☰'}
+          </button>
         </div>
+
+        {/* Mobile menu */}
+        {menuOpen && (
+          <div className="absolute top-14 left-0 right-0 md:hidden bg-[rgba(250,249,246,0.98)] border-b border-border flex flex-col px-6 py-4 gap-3">
+            <button onClick={goToFeatures} className="text-sm text-left">
+              Features
+            </button>
+
+            <button onClick={goToMethodology} className="text-sm text-left">
+              Methodology
+            </button>
+
+            <button
+              onClick={() => {
+                navigate('/login')
+                setMenuOpen(false)
+              }}
+              className="text-sm text-left font-semibold text-accent"
+            >
+              Get Started
+            </button>
+          </div>
+        )}
+
       </div>
     </header>
   )
